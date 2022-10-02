@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bindr',
       theme: ThemeData(
-        backgroundColor: gray,
+        canvasColor: gray,
       ),
       home: Welcome(),
     );

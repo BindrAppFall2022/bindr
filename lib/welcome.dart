@@ -5,7 +5,7 @@ class Welcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: gray,
+      backgroundColor: Theme.of(context).canvasColor,
     );
   }
 }
