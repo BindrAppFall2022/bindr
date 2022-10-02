@@ -1,13 +1,6 @@
-# bindr
+# bindr_app
 
-Software Engineering Fall 2022
-
-Bindr Textbook Exchange
-
-Uriya Sabah
-Stefan Guilas
-Junle Chen
-Andrew Viesta
+A new Flutter project.
 
 ## Getting Started
 

@@ -1,4 +1,4 @@
-package com.example.bindr
+package com.example.bindr_app
 
 import io.flutter.embedding.android.FlutterActivity
 
