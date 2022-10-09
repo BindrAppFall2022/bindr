@@ -1,5 +1,5 @@
 // import 'dart:js';
-
+import 'package:bindr_app/items/constants.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +46,7 @@ class SearchScreen extends StatelessWidget {
             Container(
               width: MediaQuery.of(context).size.width * logoWidth,
               decoration: BoxDecoration(
-                color: Theme.of(context).canvasColor,
+                color: gray,
                 // border: Border.all(),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
@@ -61,15 +61,15 @@ class SearchScreen extends StatelessWidget {
                       BoxConstraints(maxHeight: 30, maxWidth: 40),
                   suffixIcon: Container(
                     margin: const EdgeInsets.only(right: 10),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).canvasColor,
+                    decoration: const BoxDecoration(
+                      color: gray,
                       borderRadius: BorderRadius.all(Radius.circular(5)),
-                      boxShadow: const <BoxShadow>[
+                      /*boxShadow: const <BoxShadow>[
                         BoxShadow(
                             color: Colors.black,
                             blurRadius: 10,
                             blurStyle: BlurStyle.solid),
-                      ],
+                      ], */
                     ),
                     child: IconButton(
                       onPressed: () {
@@ -88,9 +88,9 @@ class SearchScreen extends StatelessWidget {
                 onChanged: (String text) {
                   currentSearchText = text;
                 },
-                onTapOutside: (PointerDownEvent pde) {
-                  FocusScope.of(context).unfocus();
-                },
+                //   onTapOutside: (PointerDownEvent pde) {
+                //     FocusScope.of(context).unfocus();
+                //   },
               ),
             ),
           ],

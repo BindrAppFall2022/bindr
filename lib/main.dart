@@ -18,11 +18,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bindr',
       theme: ThemeData(
-        canvasColor: gray,
+        canvasColor:
+            logobackground, // use logo background so that the logo blends in
         splashColor: pink,
         primaryColor: logobackground,
       ),
-      home: SearchScreen(),
+      home: Welcome(),
     );
   }
 }

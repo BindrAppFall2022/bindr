@@ -1,4 +1,5 @@
 import 'package:bindr_app/items/constants.dart';
+import 'package:bindr_app/search_screen/SearchScreen.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/background.dart';
@@ -40,7 +41,7 @@ class login_body extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      Welcome(), // this should send them to the main screen
+                      SearchScreen(), // sends to seach creen. as soon as we get authentication working
                 ),
               );
             },
