@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:bindr_app/welcome.dart';
-import 'package:bindr_app/login.dart';
-import 'package:bindr_app/constants.dart';
+import 'package:bindr_app/welcome_screen/welcome.dart';
+import 'package:bindr_app/items/rounded_button.dart';
+import 'package:bindr_app/items/constants.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bindr',
       theme: ThemeData(
-        canvasColor: gray,
+        canvasColor: logobackground,
       ),
       home: Welcome(),
     );
