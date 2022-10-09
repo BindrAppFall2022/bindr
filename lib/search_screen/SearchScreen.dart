@@ -55,7 +55,7 @@ class SearchScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: "Bookname/ISBN",
+                  hintText: "Enter Book Title, Author, or ISBN",
                   floatingLabelAlignment: FloatingLabelAlignment.center,
                   suffixIconConstraints:
                       BoxConstraints(maxHeight: 30, maxWidth: 40),
