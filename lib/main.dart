@@ -1,3 +1,4 @@
+import 'package:bindr_app/search_screen/SearchScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
 import 'package:bindr_app/items/rounded_button.dart';
@@ -17,9 +18,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Bindr',
       theme: ThemeData(
-        canvasColor: logobackground,
+        canvasColor: gray,
+        splashColor: pink,
+        primaryColor: logobackground,
       ),
-      home: Welcome(),
+      home: SearchScreen(),
     );
   }
 }
