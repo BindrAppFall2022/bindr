@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1044049872",
+    "project_id": "bindr-application",
+    "storage_bucket": "bindr-application.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044049872:android:8038590881bb46a80b53d5",
+        "android_client_info": {
+          "package_name": "com.example.bindr_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044049872-k16nrjoe99mkrdv43urg56l18j6rjhb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBcmtoEtmduRv82RXNhrHACZkmV744MTM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044049872-k16nrjoe99mkrdv43urg56l18j6rjhb6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1044049872-58g5orb373mb6pquvpt51idddcju602o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bindrApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

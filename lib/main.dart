@@ -3,27 +3,59 @@ import 'package:flutter/material.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/items/constants.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+/// We are using a StatefulWidget such that we only create the [Future] once,
+/// no matter how many times our widget rebuild.
+/// If we used a [StatelessWidget], in the event where [App] is rebuilt, that
+/// would re-initialize FlutterFire and make our application re-enter loading state,
+/// which is undesired.
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Bindr',
-      theme: ThemeData(
-        canvasColor:
-            logobackground, // use logo background so that the logo blends in
-        splashColor: pink,
-        primaryColor: logobackground,
-      ),
-      home: Welcome(),
+    return FutureBuilder(
+      // Initialize FlutterFire:
+      future: _initialization,
+      builder: (context, snapshot) {
+        // Check for errors
+        // if (snapshot.hasError) {
+        //   return Text('error', textDirection: TextDirection.ltr);
+        // }
+
+        // Once complete, show your application
+        //if (snapshot.connectionState == ConnectionState.done) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Bindr',
+          theme: ThemeData(
+            canvasColor:
+                logobackground, // use logo background so that the logo blends in
+            splashColor: pink,
+            primaryColor: logobackground,
+          ),
+          home: Welcome(),
+        );
+        //}
+
+        // Otherwise, show something whilst waiting for initialization to complete
+        //return Text('loading', textDirection: TextDirection.ltr);
+      },
     );
   }
 }
