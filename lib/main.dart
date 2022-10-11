@@ -1,14 +1,15 @@
-import 'package:bindr_app/search_screen/SearchScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
-import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+
+  /// Lock user in portrait orientation
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((value) => runApp(const MyApp()));
 }
 
 /// We are using a StatefulWidget such that we only create the [Future] once,
