@@ -23,15 +23,33 @@ class signup_body extends StatelessWidget {
           ),
           rounded_input_field(
             hide: false,
-            hintText: "Enter Email",
+            hintText: "Enter Hofstra ID",
             onChanged: (value) {},
             icon: Icons.account_circle_sharp,
           ),
           rounded_input_field(
             hide: true,
-            hintText: "Enter Password",
+            hintText: "Create Password",
             onChanged: (value) {},
             icon: Icons.lock_sharp,
+          ),
+          rounded_input_field(
+            hide: true,
+            hintText: "Confirm Password",
+            onChanged: (value) {},
+            icon: Icons.lock_sharp,
+          ),
+          rounded_input_field(
+            hide: false,
+            hintText: "Enter Hofstra Email",
+            onChanged: (value) {},
+            icon: Icons.account_circle_sharp,
+          ),
+          rounded_input_field(
+            hide: false,
+            hintText: "Confirm Hofstra Email",
+            onChanged: (value) {},
+            icon: Icons.account_circle_sharp,
           ),
           RoundButton(
             text: "SIGN UP",
