@@ -5,7 +5,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: login_body(),
+      body: LoginBody(),
       backgroundColor: Theme.of(context).canvasColor,
     );
   }

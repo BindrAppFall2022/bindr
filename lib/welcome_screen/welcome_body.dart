@@ -6,7 +6,7 @@ import 'package:bindr_app/items/background.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 
 // will be making the dy here so that we can be consistent throughout the app
-class Body extends StatelessWidget {
+class WelcomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -37,7 +37,7 @@ class Body extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      Sign_Up(), // swap this with sign up when done
+                      SignUp(), // swap this with sign up when done
                 ),
               );
             },
