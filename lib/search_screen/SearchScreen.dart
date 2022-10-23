@@ -1,8 +1,12 @@
 // import 'dart:js';
 import 'package:bindr_app/items/constants.dart';
+import 'package:bindr_app/items/rounded_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../services/auth.dart';
+import '../welcome_screen/welcome.dart';
 
 class SearchScreen extends StatelessWidget {
   //amount of the device screen height that the logo should be pushed down
@@ -14,6 +18,8 @@ class SearchScreen extends StatelessWidget {
   SearchScreen({super.key, this.logoYOffset = .15, this.logoWidth = .75});
 
   String currentSearchText = "";
+
+  final auth = AuthService(); //Temporary
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +51,7 @@ class SearchScreen extends StatelessWidget {
             ),
             Container(
               width: MediaQuery.of(context).size.width * logoWidth,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: gray,
                 // border: Border.all(),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -92,6 +98,15 @@ class SearchScreen extends StatelessWidget {
                 //     FocusScope.of(context).unfocus();
                 //   },
               ),
+            ),
+            //TEMPORARY SIGN OUT BUTTON FOR TESTING
+            RoundButton(
+              text: "Sign Out",
+              press: () async {
+                await auth.signOut();
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => Welcome()));
+              },
             ),
           ],
         ),
