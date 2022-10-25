@@ -4,11 +4,7 @@ import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:books_finder/books_finder.dart';
 
-getInfo(String? ISBNum) async {
-  if (ISBNum == null) {
-    print('Please input ISBN number to search\n');
-    return '';
-  }
+getInfo(String ISBNum) async {
   final books = await queryBooks(
     '$ISBNum',
     maxResults: 1,
@@ -16,9 +12,9 @@ getInfo(String? ISBNum) async {
     orderBy: OrderBy.relevance,
     reschemeImageLinks: true,
   );
-  
+
   final book = books[0];
-  
+
   final ISBN = book.info.industryIdentifiers;
   final Name = book.info.title;
   final Author = book.info.authors;
