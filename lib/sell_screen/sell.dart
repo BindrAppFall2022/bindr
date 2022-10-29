@@ -1,5 +1,6 @@
 import 'package:bindr_app/Book_information/getInfo.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
+import 'package:books_finder/books_finder.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
@@ -7,7 +8,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:bindr_app/Book_information/getInfo.dart';
 
 class sell_screen extends StatelessWidget {
-  String ISBN = "";
+  String isbn = "";
+  String cond = "";
+  Map<String, Object>? info;
+  String? name;
+  List<IndustryIdentifier>? google_isbn;
+  List<String>? author;
+  Uri? image;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +36,17 @@ class sell_screen extends StatelessWidget {
             hintText: "ENTER ISBN",
             icon: Icons.book_sharp,
             onChanged: (value) {
-              ISBN = value;
+              isbn = value;
             },
           ),
-          const rounded_input_field(
+          rounded_input_field(
             // enter condition
             hide: false,
             hintText: "ENTER CONDITION",
             icon: Icons.api_sharp,
+            onChanged: (value) {
+              cond = value;
+            },
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -44,7 +54,12 @@ class sell_screen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
             onPressed: () {
-              getInfo(ISBN);
+              info = getInfo(
+                  isbn); // map of things from api. keys => Name, ISBN, Author, Image.. they're all different types...
+              name = getInfo(isbn)["Name"];
+              google_isbn = getInfo(isbn)["ISBN"];
+              author = getInfo(isbn)["Author"];
+              image = getInfo(isbn)["Image"];
             },
             child: const Text(
               "GET BOOK INFO",
