@@ -1,20 +1,13 @@
 import 'package:bindr_app/Book_information/getInfo.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
-import 'package:books_finder/books_finder.dart';
+import 'package:bindr_app/sell_screen/final_sell.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/constants.dart';
-import 'package:bindr_app/items/rounded_button.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:bindr_app/Book_information/getInfo.dart';
 
 class sell_screen extends StatelessWidget {
   String isbn = "";
   String cond = "";
   Map<String, Object>? info;
-  String? name;
-  List<IndustryIdentifier>? google_isbn;
-  List<String>? author;
-  Uri? image;
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +49,20 @@ class sell_screen extends StatelessWidget {
             onPressed: () {
               info = getInfo(
                   isbn); // map of things from api. keys => Name, ISBN, Author, Image.. they're all different types...
-              name = getInfo(isbn)["Name"];
-              google_isbn = getInfo(isbn)["ISBN"];
-              author = getInfo(isbn)["Author"];
-              image = getInfo(isbn)["Image"];
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => confirm(
+                    name: getInfo(isbn)["Name"],
+                    google_isbn: getInfo(isbn)["ISBN"],
+                    author: getInfo(isbn)["Author"],
+                    image: getInfo(isbn)["Image"],
+                    cond: cond,
+                  ),
+                ),
+              );
             },
             child: const Text(
-              "GET BOOK INFO",
+              "LIST BOOK",
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
