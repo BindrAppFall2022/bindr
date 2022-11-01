@@ -12,17 +12,12 @@ class AuthService {
         password: password,
       );
       print(credential);
+      return credential;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-        //return
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-        //return
-      }
+      return e.code;
     } catch (e) {
-      // ignore: avoid_print
-      print(e);
+      //won't be reached
+      return e;
     }
   }
 
