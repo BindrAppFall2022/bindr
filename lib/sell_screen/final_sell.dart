@@ -6,16 +6,19 @@ import 'package:flutter/material.dart';
 class confirm extends StatelessWidget {
   String? name;
   String? cond;
+  String? price;
   List<IndustryIdentifier>? google_isbn;
   List<String>? author;
   Uri? image;
 
-  confirm(
-      {required this.name,
-      required this.cond,
-      required this.google_isbn,
-      required this.author,
-      required this.image});
+  confirm({
+    required this.name,
+    required this.cond,
+    required this.google_isbn,
+    required this.author,
+    required this.image,
+    required this.price,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +44,12 @@ class confirm extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Text(
                   "$name",
+                  style: const TextStyle(color: pink, fontSize: 35),
+                )),
+            Container(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  "$price",
                   style: const TextStyle(color: pink, fontSize: 35),
                 )),
             Container(

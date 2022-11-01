@@ -7,6 +7,7 @@ import 'package:bindr_app/items/constants.dart';
 class sell_screen extends StatelessWidget {
   String isbn = "";
   String cond = "";
+  String price = "";
   Map<String, Object>? info;
 
   @override
@@ -41,6 +42,15 @@ class sell_screen extends StatelessWidget {
               cond = value;
             },
           ),
+          rounded_input_field(
+            // enter condition
+            hide: false,
+            hintText: "ENTER PRICE",
+            icon: Icons.api_sharp,
+            onChanged: (value) {
+              price = value;
+            },
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: pink,
@@ -57,6 +67,7 @@ class sell_screen extends StatelessWidget {
                     author: getInfo(isbn)["Author"],
                     image: getInfo(isbn)["Image"],
                     cond: cond,
+                    price: price,
                   ),
                 ),
               );

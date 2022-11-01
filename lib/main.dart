@@ -32,36 +32,36 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      // Initialize FlutterFire:
-      future: _initialization,
-      builder: (context, snapshot) {
-        //Check for errors
-        if (snapshot.hasError) {
-          // ignore: avoid_print
-          print(snapshot.error);
-          return const Center(
-              child: Text('error', textDirection: TextDirection.ltr));
-        }
+        // Initialize FlutterFire:
+        future: _initialization,
+        builder: (context, snapshot) {
+          //Check for errors
+          if (snapshot.hasError) {
+            // ignore: avoid_print
+            print(snapshot.error);
+            return const Center(
+                child: Text('error', textDirection: TextDirection.ltr));
+          }
 
-        // Once complete, show your application
-        //if (snapshot.connectionState == ConnectionState.done) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Bindr',
-          theme: ThemeData(
-            canvasColor:
-                logobackground, // use logo background so that the logo blends in
-            splashColor: pink,
-            primaryColor: logobackground,
-          ),
-          home: sell_screen(), // change to Welcome() after you're done
-        );
-        //}
+          // Once complete, show your application
+          //if (snapshot.connectionState == ConnectionState.done) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Bindr',
+            theme: ThemeData(
+              canvasColor:
+                  logobackground, // use logo background so that the logo blends in
+              splashColor: pink,
+              primaryColor: logobackground,
+            ),
+            home: Welcome(), // change to Welcome() after you're done
+          );
+          //}
 
-        //Otherwise, show something whilst waiting for initialization to complete
-        return const Center(
+          //Otherwise, show something whilst waiting for initialization to complete
+          /*    return const Center(
             child: Text('loading', textDirection: TextDirection.ltr));
-      },
-    );
+      }, */
+        });
   }
 }
