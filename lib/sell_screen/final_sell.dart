@@ -2,26 +2,34 @@ import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:books_finder/books_finder.dart';
 import 'package:flutter/material.dart';
+import 'package:bindr_app/Book_information/getInfo.dart';
 
-class confirm extends StatelessWidget {
-  String? name;
-  String? cond;
-  String? price;
-  List<IndustryIdentifier>? google_isbn;
-  List<String>? author;
-  Uri? image;
+class confirm extends StatefulWidget {
+  String ISBN;
+  String cond;
+  String price;
 
   confirm({
-    required this.name,
+    required this.ISBN,
     required this.cond,
-    required this.google_isbn,
-    required this.author,
-    required this.image,
     required this.price,
   });
 
   @override
-  Widget build(BuildContext context) {
+  State<confirm> createState() => _confirmState();
+}
+
+class _confirmState extends State<confirm> {
+  Map<String, Object?> map = new Map<String, Object?>();
+
+  @override
+  Future<Widget?> build(BuildContext context) async {
+    // no clue whats going on here
+    final map = await getInfo(widget.ISBN);
+    //final Uri img = map["Image"];
+    final String Name = map[0];
+    final String author = map[2];
+    final String isbn = map[1];
     return Scaffold(
       backgroundColor: logobackground,
       body: Center(
@@ -34,40 +42,40 @@ class confirm extends StatelessWidget {
                   "CONFIRM BOOK INFO",
                   style: TextStyle(color: pink, fontSize: 35),
                 )),
-            Container(
+            /*  Container(
                 alignment: Alignment.topCenter,
                 child: Image.asset(
-                  "$image",
+                  img,
                   height: 0.45,
-                )),
+                )), */
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "$name",
+                  Name,
                   style: const TextStyle(color: pink, fontSize: 35),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "$price",
+                  widget.price,
                   style: const TextStyle(color: pink, fontSize: 35),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "$google_isbn",
+                  isbn,
                   style: const TextStyle(color: pink, fontSize: 35),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "$author",
+                  author,
                   style: const TextStyle(color: pink, fontSize: 35),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "$cond",
+                  widget.cond,
                   style: const TextStyle(color: pink, fontSize: 35),
                 )),
             RoundButton(

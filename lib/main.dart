@@ -54,14 +54,11 @@ class _MyAppState extends State<MyApp> {
               splashColor: pink,
               primaryColor: logobackground,
             ),
-            home: Welcome(), // change to Welcome() after you're done
+            home: sell_screen(), // change to Welcome() after you're done
           );
           //}
 
           //Otherwise, show something whilst waiting for initialization to complete
-          /*    return const Center(
-            child: Text('loading', textDirection: TextDirection.ltr));
-      }, */
         });
   }
 }

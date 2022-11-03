@@ -6,7 +6,7 @@ import 'package:books_finder/books_finder.dart';
 
 getInfo(String ISBNum) async {
   final books = await queryBooks(
-    '$ISBNum',
+    ISBNum,
     maxResults: 1,
     printType: PrintType.books,
     orderBy: OrderBy.relevance,
@@ -20,5 +20,12 @@ getInfo(String ISBNum) async {
   final Author = book.info.authors;
   final Image = book.info.imageLinks['thumbnail'];
 
-  return {"Name": Name, "ISBN": ISBN, 'Author': Author, 'Image': Image};
+  Map<String, Object?> map = {
+    "Name": Name,
+    "ISBN": ISBN,
+    'Author': Author,
+    'Image': Image
+  };
+
+  return map;
 }

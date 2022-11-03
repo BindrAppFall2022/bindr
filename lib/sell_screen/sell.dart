@@ -1,14 +1,17 @@
 import 'package:bindr_app/Book_information/getInfo.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
+import 'package:bindr_app/sell_screen/condition.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/constants.dart';
+import 'dart:collection';
 
 class sell_screen extends StatelessWidget {
   String isbn = "";
-  String cond = "";
+  String? cond = "";
   String price = "";
-  Map<String, Object>? info;
+  String currcond = "";
+  HashMap<String, Object?> map = new HashMap<String, String>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +36,13 @@ class sell_screen extends StatelessWidget {
               isbn = value;
             },
           ),
+          condition_drop(), //drop down button for condition of book
           rounded_input_field(
-            // enter condition
-            hide: false,
-            hintText: "ENTER CONDITION",
-            icon: Icons.api_sharp,
-            onChanged: (value) {
-              cond = value;
-            },
-          ),
-          rounded_input_field(
-            // enter condition
             hide: false,
             hintText: "ENTER PRICE",
             icon: Icons.api_sharp,
             onChanged: (value) {
-              price = value;
+              price = value.toString();
             },
           ),
           ElevatedButton(
@@ -57,19 +51,14 @@ class sell_screen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
             onPressed: () {
-              info = getInfo(
-                  isbn); // map of things from api. keys => Name, ISBN, Author, Image.. they're all different types...
+              // map of things from api. keys => Name, ISBN, Author, Image.. they're all different types...
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => confirm(
-                    name: getInfo(isbn)["Name"],
-                    google_isbn: getInfo(isbn)["ISBN"],
-                    author: getInfo(isbn)["Author"],
-                    image: getInfo(isbn)["Image"],
-                    cond: cond,
-                    price: price,
-                  ),
-                ),
+                    builder: (context) => confirm(
+                          ISBN: isbn,
+                          cond: currcond,
+                          price: price,
+                        )),
               );
             },
             child: const Text(
