@@ -1,35 +1,30 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
-import 'package:books_finder/books_finder.dart';
 import 'package:flutter/material.dart';
-import 'package:bindr_app/Book_information/getInfo.dart';
 
-class confirm extends StatefulWidget {
-  String ISBN;
-  String cond;
+class confirm extends StatelessWidget {
+  Object? cond;
   String price;
+  Object? Name;
+  Object? author;
+  Object? ISBN;
+  Object? pic;
+  late ImageProvider backgroundImage;
 
   confirm({
+    required this.Name,
+    required this.author,
+    required this.pic,
     required this.ISBN,
     required this.cond,
     required this.price,
   });
 
   @override
-  State<confirm> createState() => _confirmState();
-}
-
-class _confirmState extends State<confirm> {
-  Map<String, Object?> map = new Map<String, Object?>();
-
-  @override
-  Future<Widget?> build(BuildContext context) async {
-    // no clue whats going on here
-    final map = await getInfo(widget.ISBN);
-    //final Uri img = map["Image"];
-    final String Name = map[0];
-    final String author = map[2];
-    final String isbn = map[1];
+  late String a = (author as List)[0].toString();
+  late String i = (ISBN as List)[0].toString();
+  late String p = "\$ $price";
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: logobackground,
       body: Center(
@@ -42,41 +37,41 @@ class _confirmState extends State<confirm> {
                   "CONFIRM BOOK INFO",
                   style: TextStyle(color: pink, fontSize: 35),
                 )),
-            /*  Container(
-                alignment: Alignment.topCenter,
-                child: Image.asset(
-                  img,
-                  height: 0.45,
-                )), */
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              color: Colors.black,
+              child: Image.network("$pic"),
+            ),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  Name,
-                  style: const TextStyle(color: pink, fontSize: 35),
+                  cond as String,
+                  style: const TextStyle(
+                      color: pink, fontSize: 25, fontWeight: FontWeight.bold),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  widget.price,
-                  style: const TextStyle(color: pink, fontSize: 35),
+                  Name as String,
+                  style: const TextStyle(color: pink, fontSize: 25),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  isbn,
-                  style: const TextStyle(color: pink, fontSize: 35),
+                  i, //i
+                  style: const TextStyle(color: pink, fontSize: 25),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  author,
-                  style: const TextStyle(color: pink, fontSize: 35),
+                  a,
+                  style: const TextStyle(color: pink, fontSize: 25),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  widget.cond,
-                  style: const TextStyle(color: pink, fontSize: 35),
+                  p,
+                  style: const TextStyle(color: pink, fontSize: 25),
                 )),
             RoundButton(
               text: "Confirm Listing",

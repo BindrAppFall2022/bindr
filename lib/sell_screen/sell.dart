@@ -1,17 +1,30 @@
 import 'package:bindr_app/Book_information/getInfo.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
-import 'package:bindr_app/sell_screen/condition.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/constants.dart';
-import 'dart:collection';
 
-class sell_screen extends StatelessWidget {
+class sell_screen extends StatefulWidget {
+  @override
+  State<sell_screen> createState() => _sell_screenState();
+}
+
+class _sell_screenState extends State<sell_screen> {
   String isbn = "";
+
   String? cond = "";
+
   String price = "";
-  String currcond = "";
-  HashMap<String, Object?> map = new HashMap<String, String>();
+
+  String? _dropdownValue;
+
+  void dropdownCallback(String? selectedValue) {
+    if (selectedValue is String) {
+      setState(() {
+        _dropdownValue = selectedValue;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +49,36 @@ class sell_screen extends StatelessWidget {
               isbn = value;
             },
           ),
-          condition_drop(), //drop down button for condition of book
+          Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              width: size.width * 0.8,
+              decoration: BoxDecoration(
+                color: gray,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Theme(
+                  data: Theme.of(context).copyWith(
+                    canvasColor: gray,
+                  ),
+                  child: DropdownButton<String>(
+                    value: _dropdownValue,
+                    hint: const Text("SELECT CONDITION",
+                        style: TextStyle(color: logobackground)),
+                    items: const [
+                      DropdownMenuItem(
+                        value: "NEW",
+                        child: Text("NEW",
+                            style: TextStyle(color: logobackground)),
+                      ),
+                      DropdownMenuItem(
+                        value: "USED",
+                        child: Text("USED",
+                            style: TextStyle(color: logobackground)),
+                      )
+                    ],
+                    onChanged: dropdownCallback,
+                  ))), //drop down button for condition of book
           rounded_input_field(
             hide: false,
             hintText: "ENTER PRICE",
@@ -50,14 +92,18 @@ class sell_screen extends StatelessWidget {
               backgroundColor: pink,
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
-            onPressed: () {
+            onPressed: () async {
               // map of things from api. keys => Name, ISBN, Author, Image.. they're all different types...
+              Map<String, Object?> info = await getInfo(isbn);
               Navigator.of(context).push(
                 MaterialPageRoute(
                     builder: (context) => confirm(
-                          ISBN: isbn,
-                          cond: currcond,
+                          ISBN: info["ISBN"],
+                          Name: info["Name"],
+                          author: info["Author"],
+                          cond: _dropdownValue,
                           price: price,
+                          pic: info["Image"],
                         )),
               );
             },
