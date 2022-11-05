@@ -2,27 +2,31 @@ import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:flutter/material.dart';
 
-class confirm extends StatelessWidget {
-  Object? cond;
+class Confirm extends StatelessWidget {
+  String cond;
   String price;
-  Object? Name;
+  String post_title;
+  Object? book_name;
   Object? author;
-  Object? ISBN;
+  Object? isbn;
   Object? pic;
+  String? description;
   late ImageProvider backgroundImage;
 
-  confirm({
-    required this.Name,
+  Confirm({
+    required this.post_title,
+    required this.book_name,
     required this.author,
     required this.pic,
-    required this.ISBN,
+    required this.isbn,
     required this.cond,
     required this.price,
+    this.description,
   });
 
   @override
   late String a = (author as List)[0].toString();
-  late String i = (ISBN as List)[0].toString();
+  late String i = (isbn as List)[0].toString();
   late String p = "\$ $price";
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +56,7 @@ class confirm extends StatelessWidget {
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  Name as String,
+                  book_name as String,
                   style: const TextStyle(color: pink, fontSize: 25),
                 )),
             Container(

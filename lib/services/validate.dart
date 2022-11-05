@@ -21,6 +21,18 @@ class Validate {
   bool validatePassword(String password) {
     return true;
   }
+
+  bool validateISBN(String password) {
+    return true;
+  }
+
+  bool validatePrice(String price) {
+    return true;
+  }
+
+  bool validatePost(String price) {
+    return true;
+  }
 }
 
 main() {

@@ -1,22 +1,27 @@
 import 'package:bindr_app/Book_information/getInfo.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
+import 'package:bindr_app/services/validate.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/constants.dart';
 
-class sell_screen extends StatefulWidget {
+class SellScreen extends StatefulWidget {
   @override
-  State<sell_screen> createState() => _sell_screenState();
+  State<SellScreen> createState() => _SellScreenState();
 }
 
-class _sell_screenState extends State<sell_screen> {
-  String isbn = "";
+class _SellScreenState extends State<SellScreen> {
+  String? post_title;
 
-  String? cond = "";
+  String? isbn;
 
-  String price = "";
+  String? description;
+
+  String? price;
 
   String? _dropdownValue;
+
+  Validate validator = Validate();
 
   void dropdownCallback(String? selectedValue) {
     if (selectedValue is String) {
@@ -41,6 +46,15 @@ class _sell_screenState extends State<sell_screen> {
                 style: TextStyle(color: pink, fontSize: 35),
               )),
           rounded_input_field(
+            // enter post title
+            hide: false,
+            hintText: "ENTER TITLE OF LISTING",
+            icon: Icons.title_sharp,
+            onChanged: (value) {
+              post_title = value;
+            },
+          ),
+          rounded_input_field(
             // enter isbn
             hide: false,
             hintText: "ENTER ISBN",
@@ -63,6 +77,7 @@ class _sell_screenState extends State<sell_screen> {
                   ),
                   child: DropdownButton<String>(
                     value: _dropdownValue,
+                    isExpanded: true,
                     hint: const Text("SELECT CONDITION",
                         style: TextStyle(color: logobackground)),
                     items: const [
@@ -72,19 +87,41 @@ class _sell_screenState extends State<sell_screen> {
                             style: TextStyle(color: logobackground)),
                       ),
                       DropdownMenuItem(
-                        value: "USED",
-                        child: Text("USED",
+                        value: "GREAT",
+                        child: Text("GREAT",
                             style: TextStyle(color: logobackground)),
-                      )
+                      ),
+                      DropdownMenuItem(
+                        value: "GOOD",
+                        child: Text("GOOD",
+                            style: TextStyle(color: logobackground)),
+                      ),
+                      DropdownMenuItem(
+                        value: "BAD",
+                        child: Text("BAD",
+                            style: TextStyle(color: logobackground)),
+                      ),
+                      DropdownMenuItem(
+                        value: "POOR",
+                        child: Text("POOR",
+                            style: TextStyle(color: logobackground)),
+                      ),
                     ],
                     onChanged: dropdownCallback,
                   ))), //drop down button for condition of book
           rounded_input_field(
+              hide: false,
+              hintText: "ADDITIONAL DETAILS",
+              icon: Icons.format_align_left_sharp,
+              onChanged: (value) {
+                price = value;
+              }),
+          rounded_input_field(
             hide: false,
             hintText: "ENTER PRICE",
-            icon: Icons.api_sharp,
+            icon: Icons.attach_money,
             onChanged: (value) {
-              price = value.toString();
+              price = value;
             },
           ),
           ElevatedButton(
@@ -93,19 +130,36 @@ class _sell_screenState extends State<sell_screen> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
             onPressed: () async {
-              // map of things from api. keys => Name, ISBN, Author, Image.. they're all different types...
-              Map<String, Object?> info = await getInfo(isbn);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => confirm(
-                          ISBN: info["ISBN"],
-                          Name: info["Name"],
-                          author: info["Author"],
-                          cond: _dropdownValue,
-                          price: price,
-                          pic: info["Image"],
-                        )),
-              );
+              //Validate null values
+              if (isbn is String &&
+                  _dropdownValue is String &&
+                  price is String &&
+                  post_title is String) {
+                //now validate fields
+                if (validator.validateISBN(isbn!) &&
+                    validator.validatePrice(price!) &&
+                    validator.validatePost(post_title!)) {
+                  Map<String, Object?> info = await getInfo(isbn!);
+
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => Confirm(
+                              post_title: post_title!,
+                              isbn: info["ISBN"],
+                              book_name: info["Name"],
+                              author: info["Author"],
+                              cond: _dropdownValue!,
+                              description: description,
+                              price: price!,
+                              pic: info["Image"],
+                            )),
+                  );
+                } else {
+                  //handle error
+                }
+              } else {
+                //Check for which of the required fields is null, only desc isn't required
+              }
             },
             child: const Text(
               "LIST BOOK",
