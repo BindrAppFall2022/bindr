@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:bindr_app/sell_screen/sell.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,19 +32,19 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      // Initialize FlutterFire:
-      future: _initialization,
-      builder: (context, snapshot) {
-        //Check for errors
-        if (snapshot.hasError) {
-          // ignore: avoid_print
-          print(snapshot.error);
-          return const Center(
-              child: Text('error', textDirection: TextDirection.ltr));
-        }
+        // Initialize FlutterFire:
+        future: _initialization,
+        builder: (context, snapshot) {
+          //Check for errors
+          if (snapshot.hasError) {
+            // ignore: avoid_print
+            print(snapshot.error);
+            return const Center(
+                child: Text('error', textDirection: TextDirection.ltr));
+          }
 
-        // Once complete, show your application
-        if (snapshot.connectionState == ConnectionState.done) {
+          // Once complete, show your application
+          //if (snapshot.connectionState == ConnectionState.done) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Bindr',
@@ -53,14 +54,11 @@ class _MyAppState extends State<MyApp> {
               splashColor: pink,
               primaryColor: logobackground,
             ),
-            home: Welcome(),
+            home: Welcome(), // change to Welcome() after you're done
           );
-        }
+          //}
 
-        //Otherwise, show something whilst waiting for initialization to complete
-        return const Center(
-            child: Text('loading', textDirection: TextDirection.ltr));
-      },
-    );
+          //Otherwise, show something whilst waiting for initialization to complete
+        });
   }
 }

@@ -64,7 +64,7 @@ class SearchScreen extends StatelessWidget {
                   hintText: "Enter Book Title, Author, or ISBN",
                   floatingLabelAlignment: FloatingLabelAlignment.center,
                   suffixIconConstraints:
-                      BoxConstraints(maxHeight: 30, maxWidth: 40),
+                      const BoxConstraints(maxHeight: 30, maxWidth: 40),
                   suffixIcon: Container(
                     margin: const EdgeInsets.only(right: 10),
                     decoration: const BoxDecoration(
