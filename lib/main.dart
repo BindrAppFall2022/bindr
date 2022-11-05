@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
               splashColor: pink,
               primaryColor: logobackground,
             ),
-            home: Welcome(), // change to Welcome() after you're done
+            home: SellScreen(), // change to Welcome() after you're done
           );
           //}
 

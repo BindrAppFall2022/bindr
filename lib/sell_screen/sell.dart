@@ -114,7 +114,7 @@ class _SellScreenState extends State<SellScreen> {
               hintText: "ADDITIONAL DETAILS",
               icon: Icons.format_align_left_sharp,
               onChanged: (value) {
-                price = value;
+                description = value;
               }),
           rounded_input_field(
             hide: false,
