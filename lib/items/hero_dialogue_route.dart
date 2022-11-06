@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 
 class HeroDialogueRoute<T> extends PageRoute<T> {
-  HeroDialogueRoute({
+  HeroDialogueRoute(
+    this.dismissible, {
     required WidgetBuilder builder,
     bool fullscreenDialog = false,
   })  : _builder = builder,
         super(fullscreenDialog: fullscreenDialog);
 
   final WidgetBuilder _builder;
+  final bool dismissible;
 
   @override
   bool get opaque => false;
 
   @override
-  bool get barrierDismissible => false;
+  Duration get transitionDuration => const Duration(milliseconds: 300);
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 300);
+  bool get barrierDismissible => dismissible;
 
   @override
   bool get maintainState => true;
