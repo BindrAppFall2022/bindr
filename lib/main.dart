@@ -44,21 +44,27 @@ class _MyAppState extends State<MyApp> {
           }
 
           // Once complete, show your application
-          //if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Bindr',
-            theme: ThemeData(
-              canvasColor:
-                  logobackground, // use logo background so that the logo blends in
-              splashColor: pink,
-              primaryColor: logobackground,
-            ),
-            home: SellScreen(), // change to Welcome() after you're done
-          );
-          //}
+          if (snapshot.connectionState == ConnectionState.done) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Bindr',
+              theme: ThemeData(
+                canvasColor:
+                    logobackground, // use logo background so that the logo blends in
+                splashColor: pink,
+                primaryColor: logobackground,
+              ),
+              home: Welcome(),
+            );
+          }
 
           //Otherwise, show something whilst waiting for initialization to complete
+          else {
+            return const Text(
+              "Loading Resources",
+              textDirection: TextDirection.ltr,
+            );
+          }
         });
   }
 }
