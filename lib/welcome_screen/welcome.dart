@@ -25,8 +25,38 @@ class Welcome extends StatelessWidget {
             );
           } else {
             //if logged in
-            return SearchScreen();
+
+            return FutureBuilder(
+                future: AuthService().isVerified(),
+                builder: ((context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: const Text("LOADING"));
+                  } else if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return const Text("Error"); //Shouldn't reach here
+                  } else if (snapshot.data!) {
+                    return SearchScreen();
+                  } else {
+                    return Scaffold(
+                      body: WelcomeBody(),
+                      backgroundColor: Theme.of(context).canvasColor,
+                    );
+                  }
+                }));
+
+            // var result = AuthService().isVerified().then((value) {
+            //   if (value) {
+            //     return SearchScreen();
+            //   } else {
+            //     return Scaffold(
+            //       body: WelcomeBody(),
+            //       backgroundColor: Theme.of(context).canvasColor,
+            //     );
+            //   }
+            // });
+            // return result;
           }
+          ;
         });
   }
 }
