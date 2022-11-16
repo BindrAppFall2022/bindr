@@ -1,9 +1,9 @@
 // import 'dart:js';
 import 'package:bindr_app/items/constants.dart';
-import 'package:bindr_app/items/rounded_button.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:bindr_app/sell_screen/sell.dart';
 
 import '../services/auth.dart';
 import '../welcome_screen/welcome.dart';
@@ -23,16 +23,11 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-      floatingActionButton: SizedBox(
-        width: 100,
-        height: 100,
-        child: IconButton(
-          padding: const EdgeInsets.all(0),
-          icon: const Icon(Icons.menu_rounded, size: 50),
-          onPressed: () {},
-        ),
+    return SafeArea(
+        child: Scaffold(
+      appBar: AppBar(
+        backgroundColor: logobackground,
+        elevation: 0,
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
@@ -99,19 +94,81 @@ class SearchScreen extends StatelessWidget {
                 //   },
               ),
             ),
-            //TEMPORARY SIGN OUT BUTTON FOR TESTING
-            RoundButton(
-              text: "Sign Out",
-              press: () async {
-                await auth.signOut();
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => Welcome()));
-              },
-            ),
           ],
         ),
       ),
-    );
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: ListView(
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 30),
+              alignment: Alignment.center,
+              child: Text(
+                "Hi <USERNAME FROM DATABASE HERE>!",
+                style: TextStyle(
+                    color: pink, fontSize: 15, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            CircleAvatar(
+              //
+              radius: 120,
+              backgroundImage: AssetImage(
+                "assets/bindr_images/Bindr_logo_.png",
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.co_present_rounded,
+                color: pink,
+              ),
+              title: const Text("PROFILE",
+                  style: TextStyle(color: pink, fontSize: 20)),
+              onTap: () {}, // waiting for bookmarks page
+            ),
+            ListTile(
+              leading: const Icon(Icons.bookmark_border_rounded, color: pink),
+              title: const Text("BOOKMARK",
+                  style: TextStyle(color: pink, fontSize: 20)),
+              onTap: () {}, // waiting for bookmarks page
+            ),
+            ListTile(
+              leading: const Icon(Icons.book_outlined, color: pink),
+              title: const Text("SELL BOOK",
+                  style: TextStyle(color: pink, fontSize: 20)),
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => SellScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.article_outlined, color: pink),
+              title: const Text("SETTINGS",
+                  style: TextStyle(color: pink, fontSize: 20)),
+              onTap: () {}, // waiting for settings page
+            ),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app_rounded, color: pink),
+              title: const Text("SIGN OUT",
+                  style: TextStyle(color: pink, fontSize: 20)),
+              onTap: () async {
+                await auth.signOut();
+                // ignore: use_build_context_synchronously
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => Welcome()));
+              },
+            )
+          ],
+        ),
+      ),
+    ));
   }
 
   void search(String text, BuildContext context) {
