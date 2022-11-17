@@ -34,6 +34,7 @@ class Confirm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: const Text(
           "CONFIRM LISTING",
           style: TextStyle(color: pink, fontSize: 25),
