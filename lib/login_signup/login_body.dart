@@ -1,6 +1,6 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/login_signup/verify_popup.dart';
-import 'package:bindr_app/search_screen/SearchScreen.dart';
+import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/services/auth.dart';
 import 'package:bindr_app/services/validate.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:bindr_app/search_screen/SearchScreen.dart';
+import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/welcome_screen/welcome_body.dart';

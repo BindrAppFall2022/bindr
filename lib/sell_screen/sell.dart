@@ -1,7 +1,7 @@
-import 'package:bindr_app/Book_information/getInfo.dart';
+import 'package:bindr_app/services/get_info.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
-import 'package:bindr_app/search_screen/SearchScreen.dart';
+import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
 import 'package:bindr_app/services/validate.dart';
 import 'package:flutter/material.dart';
