@@ -1,5 +1,7 @@
 import 'package:bindr_app/Book_information/getInfo.dart';
+import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
+import 'package:bindr_app/search_screen/SearchScreen.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
 import 'package:bindr_app/services/validate.dart';
 import 'package:flutter/material.dart';
@@ -169,6 +171,27 @@ class _SellScreenState extends State<SellScreen> {
                   fontWeight: FontWeight.bold),
             ),
           ),
+          const SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: pink,
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            ),
+            onPressed: () {
+              Navigator.pop(context,
+                  MaterialPageRoute(builder: (context) => SearchScreen()));
+              // kept giving black sceen when using Navigator.pop(context)
+            },
+            child: const Text(
+              "GO BACK",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold),
+            ),
+          )
         ],
       ),
     );
