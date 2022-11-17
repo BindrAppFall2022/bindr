@@ -180,7 +180,7 @@ class _SellScreenState extends State<SellScreen> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
             onPressed: () {
-              Navigator.push(context,
+              Navigator.pop(context,
                   MaterialPageRoute(builder: (context) => SearchScreen()));
               // kept giving black sceen when using Navigator.pop(context)
             },
