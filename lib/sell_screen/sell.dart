@@ -141,8 +141,10 @@ class _SellScreenState extends State<SellScreen> {
                 if (validator.validateISBN(isbn!) &&
                     validator.validatePrice(price!) &&
                     validator.validatePost(post_title!)) {
+                  if (description is! String) {
+                    description = "";
+                  }
                   Map<String, Object?> info = await getInfo(isbn!);
-
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (context) => Confirm(
@@ -182,7 +184,6 @@ class _SellScreenState extends State<SellScreen> {
             onPressed: () {
               Navigator.pop(context,
                   MaterialPageRoute(builder: (context) => SearchScreen()));
-              // kept giving black sceen when using Navigator.pop(context)
             },
             child: const Text(
               "GO BACK",

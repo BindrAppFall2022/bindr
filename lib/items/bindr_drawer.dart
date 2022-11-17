@@ -39,34 +39,41 @@ class BindrDrawer extends StatelessWidget {
             ),
             title: const Text("PROFILE",
                 style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {}, // waiting for bookmarks page
+            onTap: () {
+              //Navigator.of(context).popAndPushNamed('/profile');
+            }, // waiting for profile page
           ),
           ListTile(
             leading: const Icon(Icons.bookmark_border_rounded, color: pink),
             title: const Text("BOOKMARKS",
                 style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {}, // waiting for bookmarks page
+            onTap: () {
+              //Navigator.of(context).popAndPushNamed('/bookmarks');
+            }, // waiting for bookmarks page
           ),
           ListTile(
             leading: const Icon(Icons.search_rounded, color: pink),
             title: const Text("SEARCH",
                 style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).popAndPushNamed('/search');
+            },
           ),
           ListTile(
             leading: const Icon(Icons.book_outlined, color: pink),
             title: const Text("SELL BOOK",
                 style: TextStyle(color: pink, fontSize: 20)),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => SellScreen()));
+              Navigator.of(context).popAndPushNamed('/sell');
             },
           ),
           ListTile(
             leading: const Icon(Icons.article_outlined, color: pink),
             title: const Text("SETTINGS",
                 style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {}, // waiting for settings page
+            onTap: () {
+              //Navigator.of(context).popAndPushNamed('/settings');
+            }, // waiting for settings page
           ),
           ListTile(
             leading: const Icon(Icons.exit_to_app_rounded, color: pink),

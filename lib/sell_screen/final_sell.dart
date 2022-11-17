@@ -24,23 +24,25 @@ class Confirm extends StatelessWidget {
     this.description,
   });
 
+  late String authorStr = (author as List)[0].toString();
+  late String isbnListStr = (isbn as List)[0].toString();
+  late String isbnStr = isbnListStr.split(":")[1];
+  late String priceStr = "\$ $price";
+  late String condStr = cond;
+
   @override
-  late String a = (author as List)[0].toString();
-  late String i = (isbn as List)[0].toString();
-  late String i2 = i.split(":")[1];
-  late String p = "\$ $price";
-  late String c = "CONDITION: $cond";
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "CONFIRM BOOK INFO",
+          "CONFIRM LISTING",
           style: TextStyle(color: pink, fontSize: 25),
         ),
         backgroundColor: logobackground,
       ),
       backgroundColor: logobackground,
       body: Center(
+        heightFactor: 1.1,
         child: SingleChildScrollView(
             child: Column(
           children: <Widget>[
@@ -52,11 +54,11 @@ class Confirm extends StatelessWidget {
                   style: const TextStyle(color: pink, fontSize: 40),
                 )),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               color: Colors.black,
               child: Image.network(
                 "$pic",
-                height: 400,
+                height: 350,
                 width: 500,
                 fit: BoxFit.contain,
               ),
@@ -64,48 +66,56 @@ class Confirm extends StatelessWidget {
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  c,
+                  "Condition: $condStr",
+                  style: const TextStyle(
+                      color: pink, fontSize: 25, fontWeight: FontWeight.bold),
+                )),
+            Center(
+              child: Text(
+                textAlign: TextAlign.center,
+                "Textbook: $book_name",
+                style: const TextStyle(
+                    color: pink, fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Container(
+                alignment: Alignment.topCenter,
+                child: Text(
+                  "Author: $authorStr", //i
                   style: const TextStyle(
                       color: pink, fontSize: 25, fontWeight: FontWeight.bold),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  book_name as String,
-                  style: const TextStyle(
-                      color: pink, fontSize: 30, fontWeight: FontWeight.bold),
-                )),
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  a, //i
-                  style: const TextStyle(
-                      color: pink, fontSize: 25, fontWeight: FontWeight.bold),
-                )),
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  i2,
+                  "ISBN: $isbnStr",
                   style: const TextStyle(
                       color: pink, fontSize: 20, fontWeight: FontWeight.bold),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  description as String,
+                  "Description: $description",
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: pink, fontSize: 20),
                 )),
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  p,
+                  "Listing Price: $priceStr",
                   style: const TextStyle(
                       color: pink, fontSize: 25, fontWeight: FontWeight.bold),
                 )),
             RoundButton(
               text: "Confirm Listing",
-              press: () {}, // Drew will write the function for this
+              press: () {
+                int i = 3;
+                Navigator.of(context).popUntil((route) {
+                  i -= 1;
+                  return i == 0;
+                });
+                /////Navigator.of(context).pushReplacement("POST")
+              }, ///// Drew will write the function for this
             ),
           ],
         )),
