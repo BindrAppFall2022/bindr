@@ -1,7 +1,3 @@
-import 'dart:io';
-import 'dart:async';
-import 'dart:convert' as convert;
-import 'package:http/http.dart' as http;
 import 'package:books_finder/books_finder.dart';
 
 getInfo(String ISBNum) async {
@@ -29,3 +25,7 @@ getInfo(String ISBNum) async {
 
   return map;
 }
+
+/*void main(List<String> args) async {
+  print(await getInfo("9780133943030"));
+}*/

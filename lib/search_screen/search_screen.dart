@@ -1,11 +1,9 @@
 // import 'dart:js';
 import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/constants.dart';
+import 'package:bindr_app/search_screen/search_results.dart';
 import 'package:flutter/material.dart';
-import 'package:bindr_app/sell_screen/sell.dart';
-
 import '../services/auth.dart';
-import '../welcome_screen/welcome.dart';
 
 class SearchScreen extends StatelessWidget {
   //amount of the device screen height that the logo should be pushed down
@@ -88,9 +86,6 @@ class SearchScreen extends StatelessWidget {
                 onChanged: (String text) {
                   currentSearchText = text;
                 },
-                //   onTapOutside: (PointerDownEvent pde) {
-                //     FocusScope.of(context).unfocus();
-                //   },
               ),
             ),
           ],
@@ -101,7 +96,11 @@ class SearchScreen extends StatelessWidget {
   }
 
   void search(String text, BuildContext context) {
-    debugPrint("Searching for: " + text);
+    debugPrint("Searching for: $text");
     FocusScope.of(context).unfocus();
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => SearchResults(
+              currentSearchString: text,
+            )));
   }
 }
