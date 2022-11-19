@@ -16,16 +16,16 @@ class Confirm extends StatelessWidget {
   late ImageProvider backgroundImage;
 
   Condition con(cond) {
-    if (cond == 'excellent') {
-      return Condition.excellent;
-    } else if (cond == "veryGood") {
-      return Condition.veryGood;
-    } else if (cond == "good") {
-      return Condition.good;
-    } else if (cond == "acceptable") {
-      return Condition.acceptable;
+    if (cond == 'NEW') {
+      return Condition.NEW;
+    } else if (cond == "GREAT") {
+      return Condition.GREAT;
+    } else if (cond == "GOOD") {
+      return Condition.GOOD;
+    } else if (cond == "BAD") {
+      return Condition.BAD;
     } else {
-      return Condition.bad;
+      return Condition.POOR;
     }
   }
 
