@@ -56,7 +56,7 @@ class Welcome extends StatelessWidget {
             // });
             // return result;
           }
-          ;
-        });
+        },
+      );
   }
 }
