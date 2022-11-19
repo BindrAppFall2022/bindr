@@ -91,7 +91,7 @@ class _SellScreenState extends State<SellScreen> {
                       ),
                       DropdownMenuItem(
                         value: "GREAT",
-                        child: Text("GREA",
+                        child: Text("GREAT",
                             style: TextStyle(color: logobackground)),
                       ),
                       DropdownMenuItem(
