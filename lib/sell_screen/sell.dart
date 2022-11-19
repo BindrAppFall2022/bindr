@@ -1,6 +1,6 @@
 import 'package:bindr_app/services/get_info.dart';
 import 'package:bindr_app/items/rounded_button.dart';
-import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
+import 'package:bindr_app/items/rounded_input_field.dart';
 import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
 import 'package:bindr_app/services/validate.dart';
@@ -49,6 +49,7 @@ class _SellScreenState extends State<SellScreen> {
               )),
           rounded_input_field(
             // enter post title
+            maxLength: 50,
             hide: false,
             hintText: "ENTER TITLE OF LISTING",
             icon: Icons.title_sharp,
@@ -57,7 +58,7 @@ class _SellScreenState extends State<SellScreen> {
             },
           ),
           rounded_input_field(
-            // enter isbn
+            maxLength: 13,
             hide: false,
             hintText: "ENTER ISBN",
             icon: Icons.book_sharp,
@@ -112,8 +113,9 @@ class _SellScreenState extends State<SellScreen> {
                     onChanged: dropdownCallback,
                   ))), //drop down button for condition of book
           rounded_input_field(
+              maxLength: 200,
               hide: false,
-              hintText: "ADDITIONAL DETAILS",
+              hintText: "ADDITIONAL DETAILS (optional)",
               icon: Icons.format_align_left_sharp,
               onChanged: (value) {
                 description = value;
@@ -133,14 +135,12 @@ class _SellScreenState extends State<SellScreen> {
             ),
             onPressed: () async {
               //Validate null values
-              if (isbn is String &&
-                  _dropdownValue is String &&
-                  price is String &&
-                  post_title is String) {
+              if (post_title is String && post_title != "") {
                 //now validate fields
                 if (validator.validateISBN(isbn!) &&
                     validator.validatePrice(price!) &&
-                    validator.validatePost(post_title!)) {
+                    validator.validateTitle(post_title!) &&
+                    _dropdownValue is String) {
                   if (description is! String) {
                     description = "";
                   }
