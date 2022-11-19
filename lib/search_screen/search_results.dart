@@ -85,6 +85,9 @@ class SearchResults extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: 10, /////results.length,
                     itemBuilder: ((context, index) {
+                      //leading: image
+                      //title: book_title
+                      //trailing: price
                       return const ListTile(title: Text("Item"));
                     }))
               ]),

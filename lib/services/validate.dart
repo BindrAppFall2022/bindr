@@ -22,16 +22,27 @@ class Validate {
     return true;
   }
 
-  bool validateISBN(String password) {
-    return true;
+  bool validateISBN(String? isbn) {
+    if (isbn is String && isbn != "") {
+      ////regex to check isbn
+      return true;
+    }
+    return false;
   }
 
-  bool validatePrice(String price) {
-    return true;
+  bool validatePrice(String? price) {
+    if (price is String && price != "") {
+      ////regex to check price
+      return true;
+    }
+    return false;
   }
 
-  bool validatePost(String price) {
-    return true;
+  bool validateTitle(String? title) {
+    if (title is String && title != "") {
+      return true;
+    }
+    return false;
   }
 }
 

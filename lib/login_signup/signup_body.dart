@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/background.dart';
 import 'package:bindr_app/items/rounded_button.dart';
-import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
+import 'package:bindr_app/items/rounded_input_field.dart';
 
 import '../items/hero_dialogue_route.dart';
 
