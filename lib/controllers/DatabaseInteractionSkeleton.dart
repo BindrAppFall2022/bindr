@@ -10,7 +10,20 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
   String getCollection();
   T? createFrom(Map<String, dynamic> map);
 
-  Future<List<T>> getentries(Map<String, String> queries, int pageLimit,
+  List<T> searchDB(List<String> queries, int pageLimit,
+      {required String orderBy,
+      required bool descending,
+      required List<Object?> startPoint}) {
+    Set<T> result = Set<T>();
+    for (String item in queries) {
+      for (String property in ["author", "title", "isbn"]) {
+        // call getEntries
+      }
+    }
+    return result.toList();
+  }
+
+  Future<List<T>> getEntries(Map<String, String> queries, int pageLimit,
       {required String orderBy,
       required bool descending,
       required List<Object?> startPoint}) async {
