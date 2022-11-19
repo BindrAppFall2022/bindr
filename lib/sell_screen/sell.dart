@@ -121,6 +121,7 @@ class _SellScreenState extends State<SellScreen> {
                 description = value;
               }),
           rounded_input_field(
+            maxLength: 10,
             hide: false,
             hintText: "ENTER PRICE",
             icon: Icons.attach_money,
@@ -134,17 +135,20 @@ class _SellScreenState extends State<SellScreen> {
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
             onPressed: () async {
-              //Validate null values
-              if (post_title is String && post_title != "") {
-                //now validate fields
-                if (validator.validateISBN(isbn!) &&
-                    validator.validatePrice(price!) &&
-                    validator.validateTitle(post_title!) &&
-                    _dropdownValue is String) {
-                  if (description is! String) {
-                    description = "";
-                  }
-                  Map<String, Object?> info = await getInfo(isbn!);
+              //now validate fields
+              if (validator.validateISBN(isbn) &&
+                  validator.validatePrice(price) &&
+                  validator.validateTitle(post_title) &&
+                  _dropdownValue is String) {
+                if (description is! String) {
+                  description = "";
+                }
+                Map<String, Object?>? info = await getInfo(isbn!);
+                if (info == null) {
+                  ////ERROR: ISBN NOT FOUND, PLEASE ENTER CORRECTLY
+                  debugPrint(
+                      "Error: ISBN not found, please make sure you typed it in correctly.");
+                } else {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (context) => Confirm(
@@ -158,11 +162,21 @@ class _SellScreenState extends State<SellScreen> {
                               pic: info["Image"],
                             )),
                   );
-                } else {
-                  //handle error
                 }
               } else {
-                //Check for which of the required fields is null, only desc isn't required
+                if (!validator.validateISBN(isbn)) {
+                  debugPrint("Error: Please enter a valid ISBN-10 or ISBN-13");
+                }
+                if (!validator.validatePrice(price)) {
+                  debugPrint("Error: Please enter a price in USD format");
+                }
+                if (!validator.validateTitle(post_title)) {
+                  debugPrint("Error: Title must be at least 5 characters long");
+                }
+                if (_dropdownValue is! String) {
+                  debugPrint(
+                      "Error: Please select a value for the condition of the textbook");
+                }
               }
             },
             child: const Text(

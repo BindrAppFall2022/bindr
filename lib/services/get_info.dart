@@ -8,6 +8,9 @@ getInfo(String ISBNum) async {
     orderBy: OrderBy.relevance,
     reschemeImageLinks: true,
   );
+  if (books.isEmpty) {
+    return null;
+  }
 
   final book = books[0];
 
