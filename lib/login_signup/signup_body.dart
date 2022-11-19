@@ -186,8 +186,7 @@ class SignUpBody extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) =>
-                          Login(), // swap this with sign up when done
+                      builder: (context) => Login(),
                     ),
                   );
                 },
