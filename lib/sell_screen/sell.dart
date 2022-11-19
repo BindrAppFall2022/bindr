@@ -85,28 +85,28 @@ class _SellScreenState extends State<SellScreen> {
                         style: TextStyle(color: logobackground)),
                     items: const [
                       DropdownMenuItem(
-                        value: "NEW",
-                        child: Text("NEW",
+                        value: "excellent",
+                        child: Text("Excellent",
                             style: TextStyle(color: logobackground)),
                       ),
                       DropdownMenuItem(
-                        value: "GREAT",
-                        child: Text("GREAT",
+                        value: "veryGood",
+                        child: Text("Very Good",
                             style: TextStyle(color: logobackground)),
                       ),
                       DropdownMenuItem(
-                        value: "GOOD",
-                        child: Text("GOOD",
+                        value: "good",
+                        child: Text("Good",
                             style: TextStyle(color: logobackground)),
                       ),
                       DropdownMenuItem(
-                        value: "BAD",
-                        child: Text("BAD",
+                        value: "acceptable",
+                        child: Text("Acceptable",
                             style: TextStyle(color: logobackground)),
                       ),
                       DropdownMenuItem(
-                        value: "POOR",
-                        child: Text("POOR",
+                        value: "bad",
+                        child: Text("Bad",
                             style: TextStyle(color: logobackground)),
                       ),
                     ],

@@ -1,6 +1,8 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
+import 'package:bindr_app/models/DatabaseRepresentations.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class Confirm extends StatelessWidget {
   String cond;
@@ -12,6 +14,20 @@ class Confirm extends StatelessWidget {
   Object? pic;
   String? description;
   late ImageProvider backgroundImage;
+
+  Condition con(cond) {
+    if (cond == 'excellent') {
+      return Condition.excellent;
+    } else if (cond == "veryGood") {
+      return Condition.veryGood;
+    } else if (cond == "good") {
+      return Condition.good;
+    } else if (cond == "acceptable") {
+      return Condition.acceptable;
+    } else {
+      return Condition.bad;
+    }
+  }
 
   Confirm({
     required this.post_title,
@@ -110,12 +126,17 @@ class Confirm extends StatelessWidget {
             RoundButton(
               text: "Confirm Listing",
               press: () {
-                int i = 3;
-                Navigator.of(context).popUntil((route) {
-                  i -= 1;
-                  return i == 0;
-                });
-                /////Navigator.of(context).pushReplacement("POST")
+                /* Post(
+                    author: author as String,
+                    isbn: isbn as String,
+                    condition: con(cond),
+                    description: description as String,
+                    imageURL: pic as String,
+                    lastModified: DateTime.now(),
+                    numBookmarks: 0,
+                    title: book_name as String,
+                    userID: ,
+                    ); */
               }, ///// Drew will write the function for this
             ),
           ],
