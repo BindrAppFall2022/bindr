@@ -1,14 +1,14 @@
 import '../controllers/DatabaseInteractionSkeleton.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
 
-enum Condition { excellent, veryGood, good, acceptable, bad }
+enum Condition { NEW, GREAT, GOOD, BAD, POOR }
 
 Map<Condition, String> conditionStrings = {
-  Condition.excellent: "Excellent",
-  Condition.veryGood: "Very good",
-  Condition.good: "Good",
-  Condition.acceptable: "Acceptable",
-  Condition.bad: "Bad"
+  Condition.NEW: "NEW",
+  Condition.GREAT: "GREAT",
+  Condition.GOOD: "GOOD",
+  Condition.BAD: "BAD",
+  Condition.POOR: "POOR"
 };
 
 class Post extends DBRepresentation<Post> {
