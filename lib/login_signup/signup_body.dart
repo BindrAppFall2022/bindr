@@ -1,5 +1,6 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/login_signup/login.dart';
+import 'package:bindr_app/login_signup/verify_popup.dart';
 import 'package:bindr_app/services/auth.dart';
 import 'package:bindr_app/services/validate.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
@@ -7,7 +8,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/background.dart';
 import 'package:bindr_app/items/rounded_button.dart';
-import 'package:bindr_app/login_signup/textfield/rounded_input_field.dart';
+import 'package:bindr_app/items/rounded_input_field.dart';
+
+import '../items/hero_dialogue_route.dart';
 
 // will be making the dy here so that we can be consistent throughout the app
 class SignUpBody extends StatelessWidget {
@@ -27,6 +30,7 @@ class SignUpBody extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Background(
+        child: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -79,7 +83,7 @@ class SignUpBody extends StatelessWidget {
             hide: false,
             hintText: "Enter Hofstra Email",
             onChanged: (value) {
-              emailString = value;
+              emailString = value.toLowerCase();
               if (!val.validateEmailField(emailString)) {
                 //Outline email box in red color,
                 //Red Text "Please enter a valid Hofstra email"
@@ -118,9 +122,8 @@ class SignUpBody extends StatelessWidget {
                   passwordValidated &&
                   emailsMatch &&
                   passwordsMatch) {
-                //check if username already exists.
-                //Firebase will check if email exists.
-                //Register User
+                /////check if username already exists.
+                //////Firebase will check if email exists.
                 var result =
                     await auth.registerUser(emailString, passwordString, hofID);
                 if (result is String) {
@@ -130,12 +133,27 @@ class SignUpBody extends StatelessWidget {
                     print('The account already exists for that email.');
                   }
                 } else {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          Login(), //Should we sign the user automatically?
-                    ),
-                  );
+                  Navigator.of(context).push(HeroDialogueRoute(
+                    false,
+                    builder: (context) {
+                      return VerifyPopup(
+                          buttonText: "Go To Login",
+                          buttonFunc: () {
+                            //pop to allow backwards swipe to take to Welcome instead of Signup
+                            Navigator.of(context)
+                              ..pop()
+                              ..pop()
+                              ..pushNamed('/welcome/login');
+                          },
+                          descText:
+                              "Your account has been registered. We have sent a verification email to your account. Please verify your account before logging in.");
+                    },
+                  ));
+                  //send email verification
+                  print(emailString);
+                  await auth.signIn(emailString, passwordString);
+                  await auth.sendVerificationEmail();
+                  await auth.signOut();
                 }
               } else {
                 //check cases here
@@ -185,6 +203,6 @@ class SignUpBody extends StatelessWidget {
           )
         ],
       ),
-    );
+    ));
   }
 }

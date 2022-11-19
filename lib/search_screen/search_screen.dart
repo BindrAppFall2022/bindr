@@ -1,12 +1,9 @@
 // import 'dart:js';
+import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/constants.dart';
-import 'package:bindr_app/items/rounded_button.dart';
-import 'package:flutter/gestures.dart';
+import 'package:bindr_app/search_screen/search_results.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import '../services/auth.dart';
-import '../welcome_screen/welcome.dart';
 
 class SearchScreen extends StatelessWidget {
   //amount of the device screen height that the logo should be pushed down
@@ -23,16 +20,11 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-      floatingActionButton: SizedBox(
-        width: 100,
-        height: 100,
-        child: IconButton(
-          padding: const EdgeInsets.all(0),
-          icon: const Icon(Icons.menu_rounded, size: 50),
-          onPressed: () {},
-        ),
+    return SafeArea(
+        child: Scaffold(
+      appBar: AppBar(
+        backgroundColor: logobackground,
+        elevation: 0,
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
@@ -43,7 +35,7 @@ class SearchScreen extends StatelessWidget {
             Container(
               height: MediaQuery.of(context).size.height * logoYOffset,
             ),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * logoWidth,
               child: Image(
                   image:
@@ -64,7 +56,7 @@ class SearchScreen extends StatelessWidget {
                   hintText: "Enter Book Title, Author, or ISBN",
                   floatingLabelAlignment: FloatingLabelAlignment.center,
                   suffixIconConstraints:
-                      BoxConstraints(maxHeight: 30, maxWidth: 40),
+                      const BoxConstraints(maxHeight: 30, maxWidth: 40),
                   suffixIcon: Container(
                     margin: const EdgeInsets.only(right: 10),
                     decoration: const BoxDecoration(
@@ -84,7 +76,7 @@ class SearchScreen extends StatelessWidget {
                       icon: const Icon(
                         Icons.search,
                       ),
-                      padding: EdgeInsets.all(0),
+                      padding: const EdgeInsets.all(0),
                     ),
                   ),
                 ),
@@ -94,28 +86,21 @@ class SearchScreen extends StatelessWidget {
                 onChanged: (String text) {
                   currentSearchText = text;
                 },
-                //   onTapOutside: (PointerDownEvent pde) {
-                //     FocusScope.of(context).unfocus();
-                //   },
               ),
-            ),
-            //TEMPORARY SIGN OUT BUTTON FOR TESTING
-            RoundButton(
-              text: "Sign Out",
-              press: () async {
-                await auth.signOut();
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => Welcome()));
-              },
             ),
           ],
         ),
       ),
-    );
+      drawer: BindrDrawer(),
+    ));
   }
 
   void search(String text, BuildContext context) {
-    debugPrint("Searching for: " + text);
+    debugPrint("Searching for: $text");
     FocusScope.of(context).unfocus();
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => SearchResults(
+              currentSearchString: text,
+            )));
   }
 }

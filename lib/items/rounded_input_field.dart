@@ -6,21 +6,26 @@ class rounded_input_field extends StatelessWidget {
   final String? hintText;
   final IconData? icon;
   final ValueChanged<String>? onChanged;
+  final int? maxLength;
+
   const rounded_input_field({
     Key? key,
     required this.hide,
     this.hintText,
     this.icon,
     this.onChanged,
+    this.maxLength,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Input_text_field(
       child: TextField(
+        maxLength: maxLength,
         obscureText: hide,
         onChanged: onChanged,
         decoration: InputDecoration(
+          counterText: '',
           icon: Icon(
             icon,
             color: logobackground,

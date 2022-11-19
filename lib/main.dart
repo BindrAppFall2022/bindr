@@ -1,8 +1,13 @@
+import 'package:bindr_app/login_signup/signup.dart';
+import 'package:bindr_app/search_screen/search_screen.dart';
+import 'package:bindr_app/sell_screen/sell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
+
+import 'login_signup/login.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,36 +36,48 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      // Initialize FlutterFire:
-      future: _initialization,
-      builder: (context, snapshot) {
-        //Check for errors
-        if (snapshot.hasError) {
-          // ignore: avoid_print
-          print(snapshot.error);
-          return const Center(
-              child: Text('error', textDirection: TextDirection.ltr));
-        }
+        // Initialize FlutterFire:
+        future: _initialization,
+        builder: (context, snapshot) {
+          //Check for errors
+          if (snapshot.hasError) {
+            // ignore: avoid_print
+            print(snapshot.error);
+            return const Center(
+                child: Text('error', textDirection: TextDirection.ltr));
+          }
 
-        // Once complete, show your application
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Bindr',
-            theme: ThemeData(
-              canvasColor:
-                  logobackground, // use logo background so that the logo blends in
-              splashColor: pink,
-              primaryColor: logobackground,
-            ),
-            home: Welcome(),
-          );
-        }
+          // Once complete, show your application
+          if (snapshot.connectionState == ConnectionState.done) {
+            return MaterialApp(
+              routes: <String, WidgetBuilder>{
+                '/welcome': (BuildContext context) => Welcome(),
+                '/welcome/login': (BuildContext context) => Login(),
+                '/welcome/signup': (BuildContext context) => SignUp(),
+                '/search': (BuildContext context) => SearchScreen(),
+                '/sell': (BuildContext context) => SellScreen(),
+              },
+              debugShowCheckedModeBanner: false,
+              title: 'Bindr',
+              theme: ThemeData(
+                canvasColor:
+                    logobackground, // use logo background so that the logo blends in
+                splashColor: pink,
+                primaryColor: logobackground,
+              ),
+              home: Welcome(),
+            );
+          }
 
-        //Otherwise, show something whilst waiting for initialization to complete
-        return const Center(
-            child: Text('loading', textDirection: TextDirection.ltr));
-      },
-    );
+          //Otherwise, show something whilst waiting for initialization to complete
+          else {
+            return const Center(
+              child: Text(
+                "Loading Resources",
+                textDirection: TextDirection.ltr,
+              ),
+            );
+          }
+        });
   }
 }

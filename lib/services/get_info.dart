@@ -1,17 +1,16 @@
-import 'dart:io';
-import 'dart:async';
-import 'dart:convert' as convert;
-import 'package:http/http.dart' as http;
 import 'package:books_finder/books_finder.dart';
 
 getInfo(String ISBNum) async {
   final books = await queryBooks(
-    '$ISBNum',
+    ISBNum,
     maxResults: 1,
     printType: PrintType.books,
     orderBy: OrderBy.relevance,
     reschemeImageLinks: true,
   );
+  if (books.isEmpty) {
+    return null;
+  }
 
   final book = books[0];
 
@@ -20,5 +19,16 @@ getInfo(String ISBNum) async {
   final Author = book.info.authors;
   final Image = book.info.imageLinks['thumbnail'];
 
-  return {"Name": Name, "ISBN": ISBN, 'Author': Author, 'Image': Image};
+  Map<String, Object?> map = {
+    "Name": Name,
+    "ISBN": ISBN,
+    'Author': Author,
+    'Image': Image
+  };
+
+  return map;
 }
+
+/*void main(List<String> args) async {
+  print(await getInfo("9780133943030"));
+}*/
