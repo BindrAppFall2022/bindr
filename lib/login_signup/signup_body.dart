@@ -165,21 +165,22 @@ class SignUpBody extends StatelessWidget {
                 style: TextStyle(color: gray),
               ),
               GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            Login(), // swap this with sign up when done
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "LOG IN",
-                    style: TextStyle(
-                      color: gray,
-                      fontWeight: FontWeight.bold,
+                onTap: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          Login(), // swap this with sign up when done
                     ),
-                  ))
+                  );
+                },
+                child: const Text(
+                  "LOG IN",
+                  style: TextStyle(
+                    color: gray,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
             ],
           )
         ],

@@ -27,6 +27,7 @@ class Welcome extends StatelessWidget {
             //if logged in
             return SearchScreen();
           }
-        });
+        },
+      );
   }
 }
