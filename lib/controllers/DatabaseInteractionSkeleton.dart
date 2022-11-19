@@ -92,7 +92,7 @@ class PostSerialize extends DBSerialize<Post> {
           "The condition ${map["condition"]} as retrieved from the database is invalid.");
     }
 
-    Condition cond = Condition.acceptable;
+    Condition cond = Condition.BAD;
     conditionStrings.forEach((key, value) {
       if (value == map["condition"]) cond = key;
     });
