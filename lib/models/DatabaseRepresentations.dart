@@ -77,3 +77,66 @@ class Post extends DBRepresentation<Post> {
 
   // }
 }
+
+class User extends DBRepresentation<User> {
+  DateTime? dateCreated;
+  DateTime lastModified;
+  String userID;
+  String email;
+  String hofID;
+
+  User({
+    required this.email,
+    required this.hofID,
+    required this.userID,
+    required this.lastModified,
+    DateTime? dateCreated,
+  }) {
+    // Must do this because DateTime.now() is not a constant, and so cannot be used above.
+    dateCreated = dateCreated ?? DateTime.now();
+  }
+
+  // returns the DocumentReference for firebase, or null if failed
+  @override
+  Future<String?> createEntry() async {
+    String? docReference;
+    await FirebaseFirestore.instance
+        .collection(getCollection())
+        .doc(userID)
+        .set(toMap())
+        .then(((value) {
+      onSuccess("");
+      docReference = userID;
+    })).catchError((error) {
+      onFailure(error);
+    });
+
+    return docReference;
+  }
+
+  @override
+  Map<String, String> toMap() {
+    return <String, String>{
+      "date_created": dateCreated?.millisecondsSinceEpoch.toString() ?? "-1",
+      "email": email.toString(),
+      "hofid": hofID,
+      "last_access": lastModified.millisecondsSinceEpoch.toString(),
+      //"userid": userID,
+    };
+  }
+
+  @override
+  String getCollection() {
+    return "users";
+  }
+
+  @override
+  void onSuccess(value) {
+    print("Successful operation on user with id: $userID.");
+  }
+
+  @override
+  void onFailure(err) {
+    print("Failed operation on user with id: $userID\nError: $err");
+  }
+}

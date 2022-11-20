@@ -40,9 +40,9 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
           result.add(item);
         }
       });
-      print("Successful query!");
+      debugPrint("Successful query!");
     }).catchError((error) {
-      print("Failed operation with error: $error.");
+      debugPrint("Failed operation with error: $error.");
     });
 
     return result;
@@ -116,6 +116,42 @@ class PostSerialize extends DBSerialize<Post> {
   }
 }
 
+class UserSerialize extends DBSerialize<User> {
+  @override
+  String getCollection() {
+    return "users";
+  }
+
+  @override
+  User? createFrom(Map<String, dynamic> map) {
+    List<String> allKeys = [
+      "date_created",
+      "email",
+      "hofid",
+      "last_access",
+    ];
+
+    for (String item in allKeys) {
+      if (!map.containsKey(item)) {
+        throw Exception(
+            "The key $item was not found in the entry retrieved by the database.");
+      }
+    }
+
+    return User(
+      email: map["email"],
+      hofID: map["hofid"],
+      dateCreated: DateTime.fromMillisecondsSinceEpoch(
+        int.parse(map["date_created"]!),
+      ),
+      lastModified: DateTime.fromMillisecondsSinceEpoch(
+        int.parse(map["last-modified"]!),
+      ),
+      userID: map["userid"],
+    );
+  }
+}
+
 // Use descendants of this class to write data to the database.
 abstract class DBRepresentation<T> {
   String getCollection();
@@ -142,7 +178,9 @@ abstract class DBRepresentation<T> {
     bool hadError = false;
     CollectionReference coll =
         await FirebaseFirestore.instance.collection(getCollection());
-    coll.doc(doc).update(toMap()).then(onSuccess).catchError((err) {
+    coll.doc(doc).update(toMap()).then((value) {
+      onSuccess("");
+    }).catchError((err) {
       onFailure(err);
       hadError = true;
     });
@@ -156,7 +194,9 @@ abstract class DBRepresentation<T> {
     CollectionReference coll =
         await FirebaseFirestore.instance.collection(getCollection());
 
-    coll.doc(doc).delete().then(onSuccess).catchError((error) {
+    coll.doc(doc).delete().then((value) {
+      onSuccess("");
+    }).catchError((error) {
       onFailure(error);
       hadError = true;
     });
