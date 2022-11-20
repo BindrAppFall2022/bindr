@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 
 import '../models/DatabaseRepresentations.dart';
@@ -116,14 +114,14 @@ class PostSerialize extends DBSerialize<Post> {
   }
 }
 
-class UserSerialize extends DBSerialize<User> {
+class UserSerialize extends DBSerialize<BindrUser> {
   @override
   String getCollection() {
     return "users";
   }
 
   @override
-  User? createFrom(Map<String, dynamic> map) {
+  BindrUser? createFrom(Map<String, dynamic> map) {
     List<String> allKeys = [
       "date_created",
       "email",
@@ -138,7 +136,7 @@ class UserSerialize extends DBSerialize<User> {
       }
     }
 
-    return User(
+    return BindrUser(
       email: map["email"],
       hofID: map["hofid"],
       dateCreated: DateTime.fromMillisecondsSinceEpoch(

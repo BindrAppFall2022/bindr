@@ -78,14 +78,14 @@ class Post extends DBRepresentation<Post> {
   // }
 }
 
-class User extends DBRepresentation<User> {
+class BindrUser extends DBRepresentation<BindrUser> {
   DateTime? dateCreated;
   DateTime lastModified;
   String userID;
   String email;
   String hofID;
 
-  User({
+  BindrUser({
     required this.email,
     required this.hofID,
     required this.userID,

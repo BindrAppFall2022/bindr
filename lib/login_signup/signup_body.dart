@@ -1,6 +1,7 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/login_signup/login.dart';
 import 'package:bindr_app/login_signup/verify_popup.dart';
+import 'package:bindr_app/models/DatabaseRepresentations.dart';
 import 'package:bindr_app/services/auth.dart';
 import 'package:bindr_app/services/validate.dart';
 import 'package:bindr_app/welcome_screen/welcome.dart';
@@ -149,8 +150,15 @@ class SignUpBody extends StatelessWidget {
                               "Your account has been registered. We have sent a verification email to your account. Please verify your account before logging in.");
                     },
                   ));
+                  String userID = result.user.uid;
+                  BindrUser newUser = BindrUser(
+                      email: emailString,
+                      hofID: hofID,
+                      userID: userID,
+                      lastModified: DateTime.now());
+                  //create database entry for user
+                  await newUser.createEntry();
                   //send email verification
-                  print(emailString);
                   await auth.signIn(emailString, passwordString);
                   await auth.sendVerificationEmail();
                   await auth.signOut();
