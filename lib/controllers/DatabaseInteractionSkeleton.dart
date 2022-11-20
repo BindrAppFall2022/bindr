@@ -8,15 +8,15 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
   String getCollection();
   T? createFrom(Map<String, dynamic> map);
 
-  List<T> searchDB(List<String> queries, int pageLimit,
+  Future<List<T>> searchDB(String query, int pageLimit,
       {required String orderBy,
       required bool descending,
-      required List<Object?> startPoint}) {
+      required List<Object?> startPoint}) async {
     Set<T> result = Set<T>();
-    for (String item in queries) {
-      for (String property in ["author", "title", "isbn"]) {
-        // call getEntries
-      }
+    for (String property in ["author", "title", "isbn"]) {
+      var curList = await getEntries({query: property}, pageLimit,
+          orderBy: orderBy, descending: descending, startPoint: startPoint);
+      result.addAll(curList);
     }
     return result.toList();
   }
