@@ -96,20 +96,16 @@ class PostSerialize extends DBSerialize<Post> {
     });
 
     return Post(
-      author: map["author"]!,
+      author: map["author"],
       condition: cond,
-      dateAdded_: DateTime.fromMillisecondsSinceEpoch(
-        int.parse(map["date-added"]!),
-      ),
-      description: map["description"]!,
-      imageURL: map["image-url"]!,
-      lastModified: DateTime.fromMillisecondsSinceEpoch(
-        int.parse(map["last-modified"]!),
-      ),
-      numBookmarks: int.parse(map["num_bookmarks"]!),
-      isbn: map["isbn"]!,
-      title: map["title"]!,
-      userID: map["userid"]!,
+      dateCreated: map["date_added"],
+      description: map["description"],
+      imageURL: map["image_url"],
+      lastModified: map["last_modified"],
+      numBookmarks: map["num_bookmarks"],
+      isbn: map["isbn"],
+      title: map["title"],
+      userID: map["userid"],
     );
   }
 }
@@ -139,12 +135,8 @@ class UserSerialize extends DBSerialize<BindrUser> {
     return BindrUser(
       email: map["email"],
       hofID: map["hofid"],
-      dateCreated: DateTime.fromMillisecondsSinceEpoch(
-        int.parse(map["date_created"]!),
-      ),
-      lastModified: DateTime.fromMillisecondsSinceEpoch(
-        int.parse(map["last-modified"]!),
-      ),
+      dateCreated: map["date_created"],
+      lastAccessed: map["last-modified"],
       userID: map["userid"],
     );
   }
@@ -204,7 +196,7 @@ abstract class DBRepresentation<T> {
 
   // returns list of entries from database
 
-  Map<String, String> toMap();
+  Map<String, Object?> toMap();
   void onSuccess(value);
   void onFailure(err);
 }
