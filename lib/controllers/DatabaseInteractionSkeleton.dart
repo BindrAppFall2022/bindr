@@ -14,7 +14,7 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
       required List<Object?> startPoint}) async {
     Set<T> result = Set<T>();
     for (String property in ["author", "title", "isbn"]) {
-      var curList = await getEntries({query: property}, pageLimit,
+      var curList = await getEntries({property: query}, pageLimit,
           orderBy: orderBy, descending: descending, startPoint: startPoint);
       result.addAll(curList);
     }
