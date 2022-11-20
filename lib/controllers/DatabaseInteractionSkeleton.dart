@@ -8,19 +8,6 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
   String getCollection();
   T? createFrom(Map<String, dynamic> map);
 
-  Future<List<T>> searchDB(String query, int pageLimit,
-      {required String orderBy,
-      required bool descending,
-      required List<Object?> startPoint}) async {
-    Set<T> result = Set<T>();
-    for (String property in ["author", "title", "isbn"]) {
-      var curList = await getEntries({property: query}, pageLimit,
-          orderBy: orderBy, descending: descending, startPoint: startPoint);
-      result.addAll(curList);
-    }
-    return result.toList();
-  }
-
   Future<List<T>> getEntries(Map<String, String> queries, int pageLimit,
       {required String orderBy,
       required bool descending,
@@ -75,6 +62,19 @@ class PostSerialize extends DBSerialize<Post> {
   @override
   String getCollection() {
     return "posts";
+  }
+
+  Future<List<Post>> searchDB(String query, int pageLimit,
+      {required String orderBy,
+      required bool descending,
+      required List<Object?> startPoint}) async {
+    Set<Post> result = <Post>{};
+    for (String property in ["author", "title", "isbn"]) {
+      var curList = await getEntries({property: query}, pageLimit,
+          orderBy: orderBy, descending: descending, startPoint: startPoint);
+      result.addAll(curList);
+    }
+    return result.toList();
   }
 
   @override
