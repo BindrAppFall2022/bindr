@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../controllers/DatabaseInteractionSkeleton.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
 
@@ -14,7 +16,7 @@ Map<Condition, String> conditionStrings = {
 class Post extends DBRepresentation<Post> {
   String author;
   Condition condition;
-  DateTime? dateAdded;
+  DateTime? dateCreated;
   String description;
   String imageURL;
   DateTime lastModified;
@@ -28,31 +30,33 @@ class Post extends DBRepresentation<Post> {
       {required this.author,
       required this.isbn,
       required this.condition,
+      required this.dateCreated,
       required this.description,
-      DateTime? dateAdded_,
       required this.imageURL,
       required this.lastModified,
       required this.numBookmarks,
       required this.title,
-      required this.userID}) {
-    // Must do this because DateTime.now() is not a constant, and so cannot be used above.
-    dateAdded = dateAdded_ ?? DateTime.now();
-  }
+      required this.userID});
 
   @override
-  Map<String, String> toMap() {
-    return <String, String>{
+  Map<String, Object?> toMap() {
+    Map<String, Object?> tomap = <String, Object?>{
       "author": author,
-      "condition": conditionStrings[condition] ?? "",
-      "date-added": dateAdded?.millisecondsSinceEpoch.toString() ?? "-1",
+      "condition": conditionStrings[condition],
+      "date_created": dateCreated,
       "description": description,
-      "image-url": imageURL,
-      "last-modified": lastModified.millisecondsSinceEpoch.toString(),
-      "num_bookmarks": numBookmarks.toString(),
+      "image_url": imageURL,
+      "last_modified": lastModified,
+      "num_bookmarks": numBookmarks,
       "isbn": isbn,
       "title": title,
       "userid": userID
     };
+    //on update, don't change dateAdded
+    if (dateCreated is! DateTime) {
+      tomap.remove("date_added");
+    }
+    return tomap;
   }
 
   @override
@@ -62,12 +66,12 @@ class Post extends DBRepresentation<Post> {
 
   @override
   void onSuccess(value) {
-    print("Successful operation on user with id: $userID.");
+    debugPrint("Successful operation on user with id: $userID.");
   }
 
   @override
   void onFailure(err) {
-    print("Failed operation on user with id: $userID\nError: $err");
+    debugPrint("Failed operation on user with id: $userID\nError: $err");
   }
 
   // @override
@@ -78,23 +82,20 @@ class Post extends DBRepresentation<Post> {
   // }
 }
 
-class User extends DBRepresentation<User> {
+class BindrUser extends DBRepresentation<BindrUser> {
   DateTime? dateCreated;
-  DateTime lastModified;
+  DateTime lastAccessed;
   String userID;
   String email;
   String hofID;
 
-  User({
+  BindrUser({
     required this.email,
     required this.hofID,
     required this.userID,
-    required this.lastModified,
-    DateTime? dateCreated,
-  }) {
-    // Must do this because DateTime.now() is not a constant, and so cannot be used above.
-    dateCreated = dateCreated ?? DateTime.now();
-  }
+    required this.lastAccessed,
+    required this.dateCreated,
+  });
 
   // returns the DocumentReference for firebase, or null if failed
   @override
@@ -103,7 +104,9 @@ class User extends DBRepresentation<User> {
     await FirebaseFirestore.instance
         .collection(getCollection())
         .doc(userID)
-        .set(toMap())
+        .set(
+          toMap(),
+        )
         .then(((value) {
       onSuccess("");
       docReference = userID;
@@ -115,14 +118,18 @@ class User extends DBRepresentation<User> {
   }
 
   @override
-  Map<String, String> toMap() {
-    return <String, String>{
-      "date_created": dateCreated?.millisecondsSinceEpoch.toString() ?? "-1",
+  Map<String, Object?> toMap({onUpdate = false}) {
+    var tomap = <String, Object?>{
+      "date_created": dateCreated,
       "email": email.toString(),
       "hofid": hofID,
-      "last_access": lastModified.millisecondsSinceEpoch.toString(),
-      //"userid": userID,
+      "last_access": lastAccessed,
     };
+    //on update, don't change dateAdded
+    if (dateCreated is! DateTime) {
+      tomap.remove("date_created");
+    }
+    return tomap;
   }
 
   @override
@@ -132,11 +139,11 @@ class User extends DBRepresentation<User> {
 
   @override
   void onSuccess(value) {
-    print("Successful operation on user with id: $userID.");
+    debugPrint("Successful operation on user with id: $userID.");
   }
 
   @override
   void onFailure(err) {
-    print("Failed operation on user with id: $userID\nError: $err");
+    debugPrint("Failed operation on user with id: $userID\nError: $err");
   }
 }
