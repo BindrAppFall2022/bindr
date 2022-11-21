@@ -107,6 +107,7 @@ class PostSerialize extends DBSerialize<Post> {
       "last_modified",
       "num_bookmarks",
       "postid",
+      "price",
       "title",
       "userid"
     ];
@@ -138,6 +139,7 @@ class PostSerialize extends DBSerialize<Post> {
       numBookmarks: map["num_bookmarks"],
       isbn: map["isbn"],
       postID: map["postid"],
+      price: map["price"],
       title: map["title"],
       userID: map["userid"],
     );

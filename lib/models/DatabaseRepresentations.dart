@@ -24,6 +24,7 @@ class Post extends DBRepresentation<Post> {
   Timestamp lastModified;
   int numBookmarks;
   int postID;
+  String price;
   String title;
   String userID;
   // Manage photos later
@@ -39,6 +40,7 @@ class Post extends DBRepresentation<Post> {
       required this.lastModified,
       required this.numBookmarks,
       required this.postID,
+      required this.price,
       required this.title,
       required this.userID});
 
@@ -55,6 +57,7 @@ class Post extends DBRepresentation<Post> {
       "last_modified": lastModified,
       "num_bookmarks": numBookmarks,
       "postid": postID,
+      "price": price,
       "title": title,
       "userid": userID
     };
