@@ -13,36 +13,51 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
       required bool descending,
       required List<Object?> startPoint}) async {
     CollectionReference coll =
-        await FirebaseFirestore.instance.collection(getCollection());
+        FirebaseFirestore.instance.collection(getCollection());
 
     Query current = coll;
+    Query? currentR;
+    String lastKey = "";
     queries.forEach((key, value) {
-      current = current.where(key, arrayContains: [value]);
+      lastKey = key;
+      String valueR = value.split('').reversed.join('');
+      currentR = current
+          .where(key, isGreaterThanOrEqualTo: valueR)
+          .where(key, isLessThanOrEqualTo: "$valueR~");
+      current = current
+          .where(key, isGreaterThanOrEqualTo: value)
+          .where(key, isLessThanOrEqualTo: "$value~");
     });
+    current.get().then(((value) {}));
     QuerySnapshot resultSnapshot;
     List<T> result = [];
-    current
-        .limit(pageLimit)
-        .orderBy(orderBy, descending: descending)
-        .startAt(startPoint)
-        .get()
-        .then((value) {
-      resultSnapshot = value;
-      resultSnapshot.docs.forEach((element) {
-        if (!element.exists) {
-          return;
-        }
+    for (Query? query in [current, currentR]) {
+      if (query is Query) {
+        await query
+            .limit(pageLimit)
+            //first orderBy has to be same as last key
+            .orderBy(lastKey, descending: true)
+            .orderBy(orderBy, descending: descending)
+            //.startAt(startPoint)
+            .get()
+            .then((value) {
+          resultSnapshot = value;
+          for (var element in resultSnapshot.docs) {
+            if (!element.exists) {
+              continue;
+            }
 
-        T? item = createFrom(element.data() as Map<String, dynamic>);
-        if (item != null) {
-          result.add(item);
-        }
-      });
-      debugPrint("Successful query!");
-    }).catchError((error) {
-      debugPrint("Failed operation with error: $error.");
-    });
-
+            T? item = createFrom(element.data() as Map<String, dynamic>);
+            if (item != null) {
+              result.add(item);
+            }
+          }
+          debugPrint("Successful query!");
+        }).catchError((error) {
+          debugPrint("Failed operation with error: $error.");
+        });
+      }
+    }
     return result;
   }
 
@@ -69,8 +84,9 @@ class PostSerialize extends DBSerialize<Post> {
       required bool descending,
       required List<Object?> startPoint}) async {
     Set<Post> result = <Post>{};
+    /////add book_name as a field
     for (String property in ["author", "title", "isbn"]) {
-      var curList = await getEntries({property: query}, pageLimit,
+      List<Post> curList = await getEntries({property: query}, pageLimit,
           orderBy: orderBy, descending: descending, startPoint: startPoint);
       result.addAll(curList);
     }
@@ -81,13 +97,15 @@ class PostSerialize extends DBSerialize<Post> {
   Post? createFrom(Map<String, dynamic> map) {
     List<String> allKeys = [
       "author",
+      "book_name",
       "condition",
-      "date-added",
+      "date_added",
       "description",
-      "image-url",
-      "last-modified",
-      "num_bookmarks",
+      "image_url",
       "isbn",
+      "last_modified",
+      "num_bookmarks",
+      "postid",
       "title",
       "userid"
     ];
@@ -110,6 +128,7 @@ class PostSerialize extends DBSerialize<Post> {
 
     return Post(
       author: map["author"],
+      bookName: map["book_name"],
       condition: cond,
       dateCreated: map["date_added"],
       description: map["description"],
@@ -117,6 +136,7 @@ class PostSerialize extends DBSerialize<Post> {
       lastModified: map["last_modified"],
       numBookmarks: map["num_bookmarks"],
       isbn: map["isbn"],
+      postID: map["postid"],
       title: map["title"],
       userID: map["userid"],
     );

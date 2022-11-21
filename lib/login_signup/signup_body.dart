@@ -4,6 +4,7 @@ import 'package:bindr_app/login_signup/verify_popup.dart';
 import 'package:bindr_app/models/DatabaseRepresentations.dart';
 import 'package:bindr_app/services/auth.dart';
 import 'package:bindr_app/services/validate.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/background.dart';
 import 'package:bindr_app/items/rounded_button.dart';
@@ -149,7 +150,7 @@ class SignUpBody extends StatelessWidget {
                     },
                   ));
                   String userID = result.user.uid;
-                  DateTime currentTime = DateTime.now();
+                  Timestamp currentTime = Timestamp.now();
                   BindrUser newUser = BindrUser(
                     dateCreated: currentTime,
                     email: emailString,

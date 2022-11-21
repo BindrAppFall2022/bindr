@@ -132,7 +132,7 @@ class Confirm extends StatelessWidget {
                     condition: con(cond),
                     description: description as String,
                     imageURL: pic as String,
-                    lastModified: DateTime.now(),
+                    lastModified: Timestamp.now(),
                     numBookmarks: 0,
                     title: book_name as String,
                     userID: ,

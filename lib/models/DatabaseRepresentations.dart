@@ -15,26 +15,30 @@ Map<Condition, String> conditionStrings = {
 
 class Post extends DBRepresentation<Post> {
   String author;
+  String bookName;
   Condition condition;
-  DateTime? dateCreated;
+  Timestamp? dateCreated;
   String description;
   String imageURL;
-  DateTime lastModified;
   String isbn;
+  Timestamp lastModified;
   int numBookmarks;
+  int postID;
   String title;
   String userID;
   // Manage photos later
 
   Post(
       {required this.author,
-      required this.isbn,
+      required this.bookName,
       required this.condition,
       required this.dateCreated,
       required this.description,
       required this.imageURL,
+      required this.isbn,
       required this.lastModified,
       required this.numBookmarks,
+      required this.postID,
       required this.title,
       required this.userID});
 
@@ -42,18 +46,20 @@ class Post extends DBRepresentation<Post> {
   Map<String, Object?> toMap() {
     Map<String, Object?> tomap = <String, Object?>{
       "author": author,
+      "book_name": bookName,
       "condition": conditionStrings[condition],
       "date_created": dateCreated,
       "description": description,
       "image_url": imageURL,
+      "isbn": isbn,
       "last_modified": lastModified,
       "num_bookmarks": numBookmarks,
-      "isbn": isbn,
+      "postid": postID,
       "title": title,
       "userid": userID
     };
     //on update, don't change dateAdded
-    if (dateCreated is! DateTime) {
+    if (dateCreated is! Timestamp) {
       tomap.remove("date_added");
     }
     return tomap;
@@ -74,6 +80,15 @@ class Post extends DBRepresentation<Post> {
     debugPrint("Failed operation on user with id: $userID\nError: $err");
   }
 
+  //For the set comparisons
+  @override
+  bool operator ==(Object other) {
+    return postID == other.hashCode;
+  }
+
+  @override
+  int get hashCode => postID;
+
   // @override
   // static Future<Post> readEntry(Map<String, String> queries) {
   //   bool hadError = false;
@@ -83,8 +98,8 @@ class Post extends DBRepresentation<Post> {
 }
 
 class BindrUser extends DBRepresentation<BindrUser> {
-  DateTime? dateCreated;
-  DateTime lastAccessed;
+  Timestamp? dateCreated;
+  Timestamp lastAccessed;
   String userID;
   String email;
   String hofID;
@@ -126,7 +141,7 @@ class BindrUser extends DBRepresentation<BindrUser> {
       "last_access": lastAccessed,
     };
     //on update, don't change dateAdded
-    if (dateCreated is! DateTime) {
+    if (dateCreated is! Timestamp) {
       tomap.remove("date_created");
     }
     return tomap;
