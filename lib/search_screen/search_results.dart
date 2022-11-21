@@ -1,31 +1,70 @@
+import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:flutter/material.dart';
 
 import '../items/constants.dart';
+import '../models/DatabaseRepresentations.dart';
 
-class SearchResults extends StatelessWidget {
-  String currentSearchString;
-  final _controllerSearchBar = TextEditingController();
+class SearchResults extends StatefulWidget {
+  final String searchString;
   final double barWidth;
+
+  const SearchResults({
+    super.key,
+    required this.searchString,
+    this.barWidth = .75,
+  });
+
+  @override
+  State<SearchResults> createState() => _SearchResultsState();
+}
+
+class _SearchResultsState extends State<SearchResults> {
+  final _controllerSearchBar = TextEditingController();
+
+  String currentSearchString = "";
+
   String sortDate = 'new';
+
   String sortPrice = '';
 
-  SearchResults(
-      {super.key, required this.currentSearchString, this.barWidth = .75});
+  List<Object?> lastPost = [null];
+  List<Post> postList = [];
 
-//List Values from firestore
-//https://stackoverflow.com/questions/71844895/how-to-list-values-from-documents-in-flutter-firestore
+  @override
+  SearchResults get widget => super.widget;
 
-//Toggle Buttons
-//https://www.youtube.com/watch?v=v2QGS4UqaqA&ab_channel=JohannesMilke
+  bool loading = false, finishedLoading = false;
+  fetchData() async {
+    if (finishedLoading) {
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    List<Post> newList = await PostSerialize().searchDB(
+        widget.searchString, pageLimit,
+        descending: true, orderBy: 'last_modified', startPoint: lastPost);
+    if (newList.isNotEmpty) {
+      postList.addAll(newList);
+      lastPost = [postList[postList.length - 1]];
+    }
+    setState(() {
+      loading = false;
+      finishedLoading = newList.isEmpty;
+    });
+  }
 
-//Small popup menu for sort button
-
-//Something to think about: Recommendations while searching
-//https://medium.flutterdevs.com/implement-searching-with-firebase-firestore-flutter-de7ebd53c8c9
+  @override
+  void initState() {
+    super.initState();
+    currentSearchString = widget.searchString;
+    fetchData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _controllerSearchBar.text = currentSearchString;
+    _controllerSearchBar.text = widget.searchString;
+    Size size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -39,7 +78,7 @@ class SearchResults extends StatelessWidget {
               child: Column(children: <Widget>[
                 Container(
                   margin: const EdgeInsets.only(left: 10),
-                  width: MediaQuery.of(context).size.width * barWidth,
+                  width: MediaQuery.of(context).size.width * widget.barWidth,
                   decoration: const BoxDecoration(
                     color: gray,
                     // border: Border.all(),
@@ -53,8 +92,9 @@ class SearchResults extends StatelessWidget {
                       border: InputBorder.none,
                       hintText: "Enter Book Title, Author, or ISBN",
                       floatingLabelAlignment: FloatingLabelAlignment.center,
-                      suffixIconConstraints:
-                          const BoxConstraints(maxHeight: 30, maxWidth: 40),
+                      suffixIconConstraints: BoxConstraints(
+                          maxHeight: size.height * 0.2,
+                          maxWidth: size.width * 0.2),
                       suffixIcon: Container(
                         margin: const EdgeInsets.only(right: 10),
                         decoration: const BoxDecoration(
@@ -62,8 +102,20 @@ class SearchResults extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
                         child: IconButton(
-                          onPressed: () {
+                          onPressed: () async {
                             //same as onSubmitted
+                            FocusScope.of(context).unfocus();
+                            if (currentSearchString.isNotEmpty) {
+                              FocusScope.of(context).unfocus();
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                      builder: (context) => SearchResults(
+                                            searchString: currentSearchString,
+                                          )));
+                            } else {
+                              /////pop up
+                              debugPrint("ERROR: Search String is empty");
+                            }
                           },
                           icon: const Icon(
                             Icons.search,
@@ -72,24 +124,48 @@ class SearchResults extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onSubmitted: (String text) {
-                      //pushReplacement
+                    onSubmitted: (String text) async {
+                      FocusScope.of(context).unfocus();
+                      if (currentSearchString.isNotEmpty) {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => SearchResults(
+                                  searchString: currentSearchString,
+                                )));
+                      } else {
+                        /////pop up
+                        debugPrint("ERROR: Search String is empty");
+                      }
                     },
                     onChanged: (String text) {
-                      //update string
+                      currentSearchString = text;
                     },
                   ),
                 ),
-                ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: 10, /////results.length,
-                    itemBuilder: ((context, index) {
-                      //leading: image
-                      //title: book_title
-                      //trailing: price
-                      return const ListTile(title: Text("Item"));
-                    }))
+                Container(
+                  padding: const EdgeInsets.all(22.0),
+                  child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: postList.length,
+                      itemBuilder: ((context, index) {
+                        //leading: image
+                        //title: book_title
+                        //trailing: price
+                        return SizedBox(
+                          height: size.height * 0.20,
+                          child: ListTile(
+                            leading: Image.network(postList[index].imageURL,
+                                fit: BoxFit.contain),
+                            title: Text(postList[index].bookName),
+                            tileColor: gray,
+                            trailing: Text("\$${postList[index].price}"),
+                            hoverColor: pink,
+                            textColor: Colors.black,
+                            //onTap: ,
+                          ),
+                        );
+                      })),
+                ),
               ]),
             )));
   }
