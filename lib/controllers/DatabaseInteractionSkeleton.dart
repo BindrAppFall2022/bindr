@@ -92,16 +92,6 @@ class PostSerialize extends DBSerialize<Post> {
               resultSnapshot.docs[0].data() as Map<String, dynamic>;
           return data["postid"] + 1;
         }
-        // for (var element in resultSnapshot.docs) {
-        //   if (!element.exists) {
-        //     continue;
-        //   }
-
-        //   Post? item = createFrom(element.data() as Map<String, dynamic>);
-        //   if (item != null) {
-        //     result.add(item);
-        //   }
-        // }
       },
     ).catchError((error) {
       debugPrint("Failed operation with error: $error.");
