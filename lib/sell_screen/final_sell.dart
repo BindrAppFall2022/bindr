@@ -1,3 +1,4 @@
+import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/models/DatabaseRepresentations.dart';
@@ -125,8 +126,8 @@ class Confirm extends StatelessWidget {
                 )),
             RoundButton(
               text: "Confirm Listing",
-              press: () {
-                Post(
+              press: () async {
+                Post entry = await Post(
                   author: author as String,
                   bookName: book_name as String,
                   condition: con(cond),
@@ -136,10 +137,13 @@ class Confirm extends StatelessWidget {
                   isbn: isbn as String,
                   lastModified: Timestamp.fromDate(DateTime.now()),
                   numBookmarks: 0,
-                  postID: 0,
+                  price: price,
+                  postID:
+                      await PostSerialize().newPostID(), /////update this after.
                   title: post_title,
                   userID: FirebaseAuth.instance.currentUser?.uid as String,
                 );
+                entry.createEntry();
               }, ///// Drew will write the function for this
             ),
           ],

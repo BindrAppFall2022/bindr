@@ -28,7 +28,6 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
           .where(key, isGreaterThanOrEqualTo: value)
           .where(key, isLessThanOrEqualTo: "$value~");
     });
-    current.get().then(((value) {}));
     QuerySnapshot resultSnapshot;
     List<T> result = [];
     for (Query? query in [current, currentR]) {
@@ -65,7 +64,7 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
   // returns the object if found, null if not found
   Future<T?> readEntry(String doc) async {
     CollectionReference coll =
-        await FirebaseFirestore.instance.collection(getCollection());
+        FirebaseFirestore.instance.collection(getCollection());
 
     var queryRes = await coll.doc(doc).get();
 
@@ -78,6 +77,36 @@ class PostSerialize extends DBSerialize<Post> {
   @override
   String getCollection() {
     return "posts";
+  }
+
+  Future<int> newPostID() async {
+    Query query = FirebaseFirestore.instance
+        .collection(getCollection())
+        .orderBy('date_added')
+        .limit(1);
+    await query.get().then(
+      (value) {
+        var resultSnapshot = value;
+        if (resultSnapshot.docs.isNotEmpty) {
+          Map<String, dynamic> data =
+              resultSnapshot.docs[0].data() as Map<String, dynamic>;
+          return data["postid"] + 1;
+        }
+        // for (var element in resultSnapshot.docs) {
+        //   if (!element.exists) {
+        //     continue;
+        //   }
+
+        //   Post? item = createFrom(element.data() as Map<String, dynamic>);
+        //   if (item != null) {
+        //     result.add(item);
+        //   }
+        // }
+      },
+    ).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+    });
+    return 1;
   }
 
   Future<List<Post>> searchDB(String query, int pageLimit,
@@ -203,7 +232,7 @@ abstract class DBRepresentation<T> {
   Future<bool> updateEntry(String doc) async {
     bool hadError = false;
     CollectionReference coll =
-        await FirebaseFirestore.instance.collection(getCollection());
+        FirebaseFirestore.instance.collection(getCollection());
     coll.doc(doc).update(toMap()).then((value) {
       onSuccess("");
     }).catchError((err) {
@@ -218,7 +247,7 @@ abstract class DBRepresentation<T> {
   Future<bool> deleteEntry(String doc) async {
     bool hadError = false;
     CollectionReference coll =
-        await FirebaseFirestore.instance.collection(getCollection());
+        FirebaseFirestore.instance.collection(getCollection());
 
     coll.doc(doc).delete().then((value) {
       onSuccess("");
