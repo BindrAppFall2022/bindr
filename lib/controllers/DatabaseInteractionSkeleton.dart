@@ -33,14 +33,15 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
     List<T> result = [];
     for (Query? query in [current, currentR]) {
       if (query is Query) {
-        await query
+        var q1 = query
             .limit(pageLimit)
             //first orderBy has to be same as last key
             .orderBy(lastKey, descending: true)
-            .orderBy(orderBy, descending: descending)
-            //.startAt(startPoint)
-            .get()
-            .then((value) {
+            .orderBy(orderBy, descending: descending);
+        if (startPoint[0] != null) {
+          q1 = q1.startAfter(startPoint);
+        }
+        await q1.get().then((value) {
           resultSnapshot = value;
           for (var element in resultSnapshot.docs) {
             if (!element.exists) {
@@ -52,7 +53,7 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
               result.add(item);
             }
           }
-          debugPrint("Successful query!");
+          //debugPrint("Successful query!");
         }).catchError((error) {
           debugPrint("Failed operation with error: $error.");
         });
@@ -85,7 +86,7 @@ class PostSerialize extends DBSerialize<Post> {
       required List<Object?> startPoint}) async {
     Set<Post> result = <Post>{};
     /////add book_name as a field
-    for (String property in ["author", "title", "isbn"]) {
+    for (String property in ["author", "title", "isbn", "book_name"]) {
       List<Post> curList = await getEntries({property: query}, pageLimit,
           orderBy: orderBy, descending: descending, startPoint: startPoint);
       result.addAll(curList);
