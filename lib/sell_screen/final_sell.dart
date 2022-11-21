@@ -1,8 +1,9 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/models/DatabaseRepresentations.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 class Confirm extends StatelessWidget {
   String cond;
@@ -44,7 +45,6 @@ class Confirm extends StatelessWidget {
   late String isbnListStr = (isbn as List)[0].toString();
   late String isbnStr = isbnListStr.split(":")[1];
   late String priceStr = "\$ $price";
-  late String condStr = cond;
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +83,7 @@ class Confirm extends StatelessWidget {
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "Condition: $condStr",
+                  "Condition: $cond",
                   style: const TextStyle(
                       color: pink, fontSize: 25, fontWeight: FontWeight.bold),
                 )),
@@ -126,17 +126,20 @@ class Confirm extends StatelessWidget {
             RoundButton(
               text: "Confirm Listing",
               press: () {
-                /* Post(
-                    author: author as String,
-                    isbn: isbn as String,
-                    condition: con(cond),
-                    description: description as String,
-                    imageURL: pic as String,
-                    lastModified: Timestamp.now(),
-                    numBookmarks: 0,
-                    title: book_name as String,
-                    userID: ,
-                    ); */
+                Post(
+                  author: author as String,
+                  bookName: book_name as String,
+                  condition: con(cond),
+                  dateCreated: Timestamp.fromDate(DateTime.now()),
+                  description: description as String,
+                  imageURL: pic as String,
+                  isbn: isbn as String,
+                  lastModified: Timestamp.fromDate(DateTime.now()),
+                  numBookmarks: 0,
+                  postID: 0,
+                  title: post_title,
+                  userID: FirebaseAuth.instance.currentUser?.uid as String,
+                );
               }, ///// Drew will write the function for this
             ),
           ],
