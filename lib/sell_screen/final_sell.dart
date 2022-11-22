@@ -2,6 +2,8 @@ import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/models/DatabaseRepresentations.dart';
+import 'package:bindr_app/search_screen/search_screen.dart';
+import 'package:bindr_app/sell_screen/confirm_listing.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -144,6 +146,8 @@ class Confirm extends StatelessWidget {
                   userID: FirebaseAuth.instance.currentUser!.uid,
                 );
                 entry.createEntry();
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => confirm_screen()));
                 //.then((value) {
                 //   Navigator.of(context)
                 //     ..pop()
