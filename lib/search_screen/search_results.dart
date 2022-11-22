@@ -143,26 +143,25 @@ class _SearchResultsState extends State<SearchResults> {
                 ),
                 Container(
                   padding: const EdgeInsets.all(22.0),
+                  height: 200,
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       itemCount: postList.length,
+                      itemExtent: 200,
                       itemBuilder: ((context, index) {
                         //leading: image
                         //title: book_title
                         //trailing: price
-                        return SizedBox(
-                          height: size.height * 0.20,
-                          child: ListTile(
-                            leading: Image.network(postList[index].imageURL,
-                                fit: BoxFit.contain),
-                            title: Text(postList[index].bookName),
-                            tileColor: gray,
-                            trailing: Text("\$${postList[index].price}"),
-                            hoverColor: pink,
-                            textColor: Colors.black,
-                            //onTap: ,
-                          ),
+                        return ListTile(
+                          leading: Image.network(postList[index].imageURL,
+                              fit: BoxFit.fill),
+                          title: Text(postList[index].bookName),
+                          tileColor: gray,
+                          trailing: Text("\$${postList[index].price}"),
+                          hoverColor: pink,
+                          textColor: Colors.black,
+                          //onTap: ,
                         );
                       })),
                 ),
