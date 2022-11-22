@@ -45,7 +45,7 @@ class Confirm extends StatelessWidget {
   late String authorStr = (author as List)[0].toString();
   late String isbnListStr = (isbn as List)[0].toString();
   late String isbnStr = isbnListStr.split(":")[1];
-  late String priceStr = "\$ $price";
+  late String priceStr = "\$$price";
 
   @override
   Widget build(BuildContext context) {
@@ -127,24 +127,30 @@ class Confirm extends StatelessWidget {
             RoundButton(
               text: "Confirm Listing",
               press: () async {
-                Post entry = await Post(
-                  author: author as String,
+                int postID = await PostSerialize().newPostID();
+                Post entry = Post(
+                  author: authorStr,
                   bookName: book_name as String,
                   condition: con(cond),
                   dateCreated: Timestamp.fromDate(DateTime.now()),
                   description: description as String,
-                  imageURL: pic as String,
-                  isbn: isbn as String,
+                  imageURL: "$pic",
+                  isbn: isbnStr,
                   lastModified: Timestamp.fromDate(DateTime.now()),
                   numBookmarks: 0,
-                  price: price,
-                  postID:
-                      await PostSerialize().newPostID(), /////update this after.
+                  price: priceStr,
+                  postID: postID,
                   title: post_title,
-                  userID: FirebaseAuth.instance.currentUser?.uid as String,
+                  userID: FirebaseAuth.instance.currentUser!.uid,
                 );
                 entry.createEntry();
-              }, ///// Drew will write the function for this
+                //.then((value) {
+                //   Navigator.of(context)
+                //     ..pop()
+                //     ..pop()
+                //     ..push(); //push the screen view
+                // });
+              },
             ),
           ],
         )),

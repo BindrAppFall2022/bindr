@@ -1,20 +1,21 @@
 // import 'dart:js';
+import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/search_screen/search_results.dart';
 import 'package:flutter/material.dart';
+import '../models/DatabaseRepresentations.dart';
 import '../services/auth.dart';
 
 class SearchScreen extends StatelessWidget {
   //amount of the device screen height that the logo should be pushed down
   // default is .15
   final double logoYOffset;
-
   final double logoWidth;
 
   SearchScreen({super.key, this.logoYOffset = .15, this.logoWidth = .75});
 
-  String currentSearchText = "";
+  String currentSearchString = "";
 
   final auth = AuthService(); //Temporary
 
@@ -70,8 +71,17 @@ class SearchScreen extends StatelessWidget {
                       ], */
                     ),
                     child: IconButton(
-                      onPressed: () {
-                        search(currentSearchText, context);
+                      onPressed: () async {
+                        FocusScope.of(context).unfocus();
+                        if (currentSearchString.isNotEmpty) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => SearchResults(
+                                    searchString: currentSearchString,
+                                  )));
+                        } else {
+                          /////pop up
+                          debugPrint("ERROR: Search String is empty");
+                        }
                       },
                       icon: const Icon(
                         Icons.search,
@@ -80,11 +90,20 @@ class SearchScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                onSubmitted: (String text) {
-                  search(text, context);
+                onSubmitted: (String text) async {
+                  FocusScope.of(context).unfocus();
+                  if (currentSearchString.isNotEmpty) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SearchResults(
+                              searchString: currentSearchString,
+                            )));
+                  } else {
+                    /////pop up
+                    debugPrint("ERROR: Search String is empty");
+                  }
                 },
                 onChanged: (String text) {
-                  currentSearchText = text;
+                  currentSearchString = text;
                 },
               ),
             ),
@@ -95,12 +114,17 @@ class SearchScreen extends StatelessWidget {
     ));
   }
 
-  void search(String text, BuildContext context) {
-    debugPrint("Searching for: $text");
-    FocusScope.of(context).unfocus();
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => SearchResults(
-              currentSearchString: text,
-            )));
-  }
+  // static Future<MaterialPageRoute<dynamic>> search(
+  //     String searchText, BuildContext context, List<Object?> startAfter) async {
+  //   FocusScope.of(context).unfocus();
+  //   List<Post> postList = await PostSerialize().searchDB(
+  //       searchText.toLowerCase(), pageLimit,
+  //       orderBy: "last_modified", descending: true, startPoint: startAfter);
+  //   return MaterialPageRoute(
+  //       builder: (context) => SearchResults(
+  //             searchString: searchText,
+  //             lastPost: startAfter,
+  //             postList: postList,
+  //           ));
+  // }
 }

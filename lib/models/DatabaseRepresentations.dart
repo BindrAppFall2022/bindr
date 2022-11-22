@@ -63,7 +63,7 @@ class Post extends DBRepresentation<Post> {
     };
     //on update, don't change dateAdded
     if (dateCreated is! Timestamp) {
-      tomap.remove("date_added");
+      tomap.remove("date_created");
     }
     return tomap;
   }

@@ -82,21 +82,24 @@ class PostSerialize extends DBSerialize<Post> {
   Future<int> newPostID() async {
     Query query = FirebaseFirestore.instance
         .collection(getCollection())
-        .orderBy('date_added')
+        .orderBy('date_created', descending: true)
         .limit(1);
-    await query.get().then(
+    var value = await query.get().then(
       (value) {
         var resultSnapshot = value;
         if (resultSnapshot.docs.isNotEmpty) {
           Map<String, dynamic> data =
               resultSnapshot.docs[0].data() as Map<String, dynamic>;
           return data["postid"] + 1;
+        } else {
+          return 1;
         }
       },
     ).catchError((error) {
       debugPrint("Failed operation with error: $error.");
+      return 0;
     });
-    return 1;
+    return value;
   }
 
   Future<List<Post>> searchDB(String query, int pageLimit,
@@ -119,7 +122,7 @@ class PostSerialize extends DBSerialize<Post> {
       "author",
       "book_name",
       "condition",
-      "date_added",
+      "date_created",
       "description",
       "image_url",
       "isbn",
@@ -151,7 +154,7 @@ class PostSerialize extends DBSerialize<Post> {
       author: map["author"],
       bookName: map["book_name"],
       condition: cond,
-      dateCreated: map["date_added"],
+      dateCreated: map["date_created"],
       description: map["description"],
       imageURL: map["image_url"],
       lastModified: map["last_modified"],
