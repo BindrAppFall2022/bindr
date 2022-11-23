@@ -108,7 +108,7 @@ class PostSerialize extends DBSerialize<Post> {
       required List<Object?> startPoint}) async {
     Set<Post> result = <Post>{};
     /////add book_name as a field
-    for (String property in ["author", "title", "isbn", "book_name"]) {
+    for (String property in ["q_author", "q_title", "isbn", "q_book_name"]) {
       List<Post> curList = await getEntries({property: query}, pageLimit,
           orderBy: orderBy, descending: descending, startPoint: startPoint);
       result.addAll(curList);
@@ -130,6 +130,9 @@ class PostSerialize extends DBSerialize<Post> {
       "num_bookmarks",
       "postid",
       "price",
+      "q_author",
+      "q_book_name",
+      "q_title",
       "title",
       "userid"
     ];
@@ -140,13 +143,13 @@ class PostSerialize extends DBSerialize<Post> {
       }
     }
 
-    if (!conditionStrings.containsValue(map["condition"])) {
+    if (!conditionToValue.containsValue(map["condition"])) {
       throw Exception(
           "The condition ${map["condition"]} as retrieved from the database is invalid.");
     }
 
     Condition cond = Condition.BAD;
-    conditionStrings.forEach((key, value) {
+    conditionToValue.forEach((key, value) {
       if (value == map["condition"]) cond = key;
     });
 
@@ -162,6 +165,9 @@ class PostSerialize extends DBSerialize<Post> {
       isbn: map["isbn"],
       postID: map["postid"],
       price: map["price"],
+      qAuthor: map["q_author"],
+      qBookName: map["q_book_name"],
+      qTitle: map["q_title"],
       title: map["title"],
       userID: map["userid"],
     );

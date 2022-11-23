@@ -1,10 +1,8 @@
 // import 'dart:js';
-import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/search_screen/search_results.dart';
 import 'package:flutter/material.dart';
-import '../models/DatabaseRepresentations.dart';
 import '../services/auth.dart';
 
 class SearchScreen extends StatelessWidget {

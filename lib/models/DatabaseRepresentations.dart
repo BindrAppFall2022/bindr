@@ -5,12 +5,20 @@ import "package:cloud_firestore/cloud_firestore.dart";
 
 enum Condition { NEW, GREAT, GOOD, BAD, POOR }
 
-Map<Condition, String> conditionStrings = {
+Map<Condition, String> conditionToString = {
   Condition.NEW: "NEW",
   Condition.GREAT: "GREAT",
   Condition.GOOD: "GOOD",
   Condition.BAD: "BAD",
   Condition.POOR: "POOR"
+};
+
+Map<Condition, int> conditionToValue = {
+  Condition.NEW: 5,
+  Condition.GREAT: 4,
+  Condition.GOOD: 3,
+  Condition.BAD: 2,
+  Condition.POOR: 1
 };
 
 class Post extends DBRepresentation<Post> {
@@ -25,6 +33,9 @@ class Post extends DBRepresentation<Post> {
   int numBookmarks;
   int postID;
   String price;
+  String qAuthor;
+  String qBookName;
+  String qTitle;
   String title;
   String userID;
   // Manage photos later
@@ -41,6 +52,9 @@ class Post extends DBRepresentation<Post> {
       required this.numBookmarks,
       required this.postID,
       required this.price,
+      required this.qAuthor,
+      required this.qBookName,
+      required this.qTitle,
       required this.title,
       required this.userID});
 
@@ -49,7 +63,7 @@ class Post extends DBRepresentation<Post> {
     Map<String, Object?> tomap = <String, Object?>{
       "author": author,
       "book_name": bookName,
-      "condition": conditionStrings[condition],
+      "condition": conditionToValue[condition],
       "date_created": dateCreated,
       "description": description,
       "image_url": imageURL,
@@ -58,6 +72,9 @@ class Post extends DBRepresentation<Post> {
       "num_bookmarks": numBookmarks,
       "postid": postID,
       "price": price,
+      "q_author": author.toLowerCase(),
+      "q_book_name": bookName.toLowerCase(),
+      "q_title": title.toLowerCase(),
       "title": title,
       "userid": userID
     };
