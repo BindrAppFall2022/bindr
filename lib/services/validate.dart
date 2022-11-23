@@ -34,7 +34,7 @@ class Validate {
 
   bool validatePrice(String? price) {
     if (price is String && price != "") {
-      RegExp priceRegex = RegExp("^([0-9]+(.[0-9]{1,2})?)\$");
+      RegExp priceRegex = RegExp("^([0-9]+(.[0-9]+)?)\$");
       if (priceRegex.hasMatch(price)) {
         return true;
       }
