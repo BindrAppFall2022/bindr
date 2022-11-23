@@ -2,7 +2,6 @@ import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 import 'package:bindr_app/models/DatabaseRepresentations.dart';
-import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/sell_screen/confirm_listing.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -152,6 +151,9 @@ class Confirm extends StatelessWidget {
                   numBookmarks: 0,
                   price: price,
                   postID: postID,
+                  qAuthor: authorStr.toLowerCase(),
+                  qBookName: (book_name as String).toLowerCase(),
+                  qTitle: post_title.toLowerCase(),
                   title: post_title,
                   userID: FirebaseAuth.instance.currentUser!.uid,
                 );
