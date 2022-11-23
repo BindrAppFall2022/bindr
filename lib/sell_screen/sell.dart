@@ -150,12 +150,16 @@ class _SellScreenState extends State<SellScreen> {
                       "Error: ISBN not found, please make sure you typed it in correctly.");
                 } else {
                   String finalPrice = formatPrice(price!);
+                  if (info["Image"] == null) {
+                    info["Image"] =
+                        "http://www.nipponniche.com/wp-content/uploads/2021/04/fentres-pdf.jpeg";
+                  }
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (context) => Confirm(
-                              post_title: post_title!,
+                              postTitle: post_title!,
                               isbn: info["ISBN"],
-                              book_name: info["Name"],
+                              bookName: info["Name"],
                               author: info["Author"],
                               cond: _dropdownValue!,
                               description: description,
