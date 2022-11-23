@@ -155,9 +155,11 @@ class Confirm extends StatelessWidget {
                   title: post_title,
                   userID: FirebaseAuth.instance.currentUser!.uid,
                 );
-                entry.createEntry();
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => confirm_screen()));
+                entry.createEntry().then((value) {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ConfirmScreen()));
+                });
+
                 //.then((value) {
                 //   Navigator.of(context)
                 //     ..pop()
