@@ -42,13 +42,23 @@ class Confirm extends StatelessWidget {
     this.description,
   });
 
-  late String authorStr = (author as List)[0].toString();
-  late String isbnListStr = (isbn as List)[0].toString();
-  late String isbnStr = isbnListStr.split(":")[1];
-  late String priceStr = "\$$price";
+  late String authorStr, isbnListStr, isbnStr;
 
   @override
   Widget build(BuildContext context) {
+    List authorList = (author as List);
+    List isbnList = (isbn as List);
+    if (authorList.isNotEmpty) {
+      authorStr = authorList[0].toString();
+    } else {
+      authorStr = "None found";
+    }
+    if (isbnList.isNotEmpty) {
+      isbnListStr = isbnList[0].toString();
+      isbnStr = isbnListStr.split(":")[1];
+    } else {
+      isbnListStr = isbnStr = "None found";
+    }
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -120,7 +130,7 @@ class Confirm extends StatelessWidget {
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  "Listing Price: $priceStr",
+                  "Listing Price: $price",
                   style: const TextStyle(
                       color: pink, fontSize: 25, fontWeight: FontWeight.bold),
                 )),
@@ -138,7 +148,7 @@ class Confirm extends StatelessWidget {
                   isbn: isbnStr,
                   lastModified: Timestamp.fromDate(DateTime.now()),
                   numBookmarks: 0,
-                  price: priceStr,
+                  price: price,
                   postID: postID,
                   title: post_title,
                   userID: FirebaseAuth.instance.currentUser!.uid,

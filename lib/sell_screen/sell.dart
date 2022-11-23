@@ -1,5 +1,5 @@
 import 'package:bindr_app/services/get_info.dart';
-import 'package:bindr_app/items/rounded_button.dart';
+import 'package:intl/intl.dart';
 import 'package:bindr_app/items/rounded_input_field.dart';
 import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/sell_screen/final_sell.dart';
@@ -149,6 +149,7 @@ class _SellScreenState extends State<SellScreen> {
                   debugPrint(
                       "Error: ISBN not found, please make sure you typed it in correctly.");
                 } else {
+                  String finalPrice = formatPrice(price!);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (context) => Confirm(
@@ -158,7 +159,7 @@ class _SellScreenState extends State<SellScreen> {
                               author: info["Author"],
                               cond: _dropdownValue!,
                               description: description,
-                              price: price!,
+                              price: finalPrice,
                               pic: info["Image"],
                             )),
                   );
@@ -211,4 +212,9 @@ class _SellScreenState extends State<SellScreen> {
       ),
     );
   }
+}
+
+String formatPrice(String price) {
+  final formatter = NumberFormat("#,##0.00", "en_US");
+  return "\$${formatter.format(double.parse(price))}";
 }
