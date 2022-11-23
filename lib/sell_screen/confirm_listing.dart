@@ -2,7 +2,9 @@ import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:flutter/material.dart';
 
-class confirm_screen extends StatelessWidget {
+class ConfirmScreen extends StatelessWidget {
+  const ConfirmScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
