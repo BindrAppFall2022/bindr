@@ -76,6 +76,7 @@ class SearchScreen extends StatelessWidget {
                               builder: (context) => SearchResults(
                                     searchString: currentSearchString,
                                   )));
+                          currentSearchString = currentSearchString;
                         } else {
                           /////pop up
                           debugPrint("ERROR: Search String is empty");
@@ -99,6 +100,7 @@ class SearchScreen extends StatelessWidget {
                     /////pop up
                     debugPrint("ERROR: Search String is empty");
                   }
+                  currentSearchString = currentSearchString;
                 },
                 onChanged: (String text) {
                   currentSearchString = text;
