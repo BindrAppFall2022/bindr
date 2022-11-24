@@ -78,7 +78,7 @@ class Post extends DBRepresentation<Post> {
       "title": title,
       "userid": userID
     };
-    //on update, don't change dateAdded
+    //on update, don't change date_created
     if (dateCreated is! Timestamp) {
       tomap.remove("date_created");
     }

@@ -8,6 +8,7 @@ class SearchResults extends StatefulWidget {
   final double barWidth;
   final int sortIndex;
   final bool descending;
+  final String orderBy;
 
   const SearchResults({
     super.key,
@@ -15,6 +16,7 @@ class SearchResults extends StatefulWidget {
     this.barWidth = .75,
     this.sortIndex = 0,
     this.descending = true,
+    this.orderBy = 'last_modified',
   });
 
   @override
@@ -22,13 +24,23 @@ class SearchResults extends StatefulWidget {
 }
 
 class _SearchResultsState extends State<SearchResults> {
-  final _controllerSearchBar = TextEditingController();
+  final TextEditingController _controllerSearchBar = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   String currentSearchString = "";
 
   int sortIndex = 0;
+
+  int itemsPerLoad = 10; //num_items before loading more
+
   late IconData sortIcon;
-  List<String> sortArray = ["Date", "Price", "Condition", "Name"];
+  List<String> orderByArray = [
+    "last_modified",
+    "price",
+    "condition",
+    "q_book_name"
+  ];
+  late String orderByKey;
   List<IconData> sortIconArr = [
     Icons.arrow_upward_sharp,
     Icons.arrow_downward_sharp,
@@ -38,12 +50,14 @@ class _SearchResultsState extends State<SearchResults> {
 
   List<Object?> lastPost = [null];
   List<Post> postList = [];
-
+  List<Post> fullData = [];
+  int curIndex = 0;
   @override
   SearchResults get widget => super.widget;
 
   bool loading = false, finishedLoading = false;
-  fetchData() async {
+
+  fetchDataInit() async {
     if (finishedLoading) {
       return;
     }
@@ -52,10 +66,51 @@ class _SearchResultsState extends State<SearchResults> {
     });
     List<Post> newList = await PostSerialize().searchDB(
         widget.searchString, pageLimit,
-        descending: descending, orderBy: 'last_modified', startPoint: lastPost);
+        descending: descending, orderBy: orderByKey, startPoint: lastPost);
+    if (newList.isNotEmpty) {
+      fullData.addAll(newList);
+      fullData =
+          sortData(data: fullData, key: orderByKey, descending: descending);
+      if (fullData.length >= itemsPerLoad) {
+        postList.addAll(fullData.sublist(curIndex, curIndex + itemsPerLoad));
+        curIndex += itemsPerLoad;
+      } else {
+        postList.addAll(fullData);
+        curIndex += fullData.length;
+      }
+      // lastPost = [
+      //   {orderByKey: postList[postList.length - 1].toMap()[orderByKey]}
+      // ];
+    }
+    setState(() {
+      loading = false;
+      finishedLoading = newList.isEmpty;
+    });
+  }
+
+  fetchData() {
+    if (finishedLoading) {
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    List<Post> newList = postList.length >= pageLimit
+        ? []
+        : () {
+            List<Post> tempList;
+            if (fullData.length - curIndex >= itemsPerLoad) {
+              tempList = fullData.sublist(curIndex, curIndex + itemsPerLoad);
+              curIndex += itemsPerLoad;
+            } else {
+              tempList = fullData.sublist(
+                  curIndex, curIndex + (fullData.length - curIndex));
+              curIndex += fullData.length - curIndex;
+            }
+            return tempList;
+          }();
     if (newList.isNotEmpty) {
       postList.addAll(newList);
-      lastPost = [postList[postList.length - 1]];
     }
     setState(() {
       loading = false;
@@ -69,14 +124,35 @@ class _SearchResultsState extends State<SearchResults> {
     currentSearchString = widget.searchString;
     sortIndex = widget.sortIndex;
     descending = widget.descending;
+    orderByKey = widget.orderBy;
     if (descending) {
       sortIcon = Icons.arrow_downward_sharp;
     } else {
       sortIcon = Icons.arrow_upward_sharp;
     }
     sortIcon = (descending) ? sortIconArr[1] : sortIconArr[0];
-    fetchData();
+    fetchDataInit();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent &&
+          !loading) {
+        // print("NEW DATA CALLED");
+        fetchData();
+      }
+    });
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controllerSearchBar.dispose();
+    _scrollController.dispose();
+  }
+
+  sortData(
+      {required List<Post> data,
+      required String key,
+      required bool descending}) {}
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +166,8 @@ class _SearchResultsState extends State<SearchResults> {
             ),
             backgroundColor: Theme.of(context).primaryColor,
             body: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Column(children: <Widget>[
                 Row(
                   children: [
@@ -130,6 +207,7 @@ class _SearchResultsState extends State<SearchResults> {
                           child: IconButton(
                               onPressed: () {
                                 setState(() {
+                                  print(_scrollController.position.pixels);
                                   descending = !descending;
                                   sortIcon = (descending)
                                       ? sortIconArr[1]
@@ -218,8 +296,9 @@ class _SearchResultsState extends State<SearchResults> {
                       return Container(
                           padding: const EdgeInsets.all(22.0),
                           child: ListView.separated(
-                            scrollDirection: Axis.vertical,
-                            physics: const ScrollPhysics(),
+                            // controller: _scrollController,
+                            // scrollDirection: Axis.vertical,
+                            physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: postList.length,
                             itemBuilder: ((context, index) {
