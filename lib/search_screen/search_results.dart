@@ -24,8 +24,11 @@ class _SearchResultsState extends State<SearchResults> {
   String currentSearchString = "";
 
   String sortDate = 'new';
-
+  int sortIndex = 0;
+  List<String> sortArray = ["Date", "Price"];
   String sortPrice = '';
+
+  bool descending = true;
 
   List<Object?> lastPost = [null];
   List<Post> postList = [];
@@ -43,7 +46,7 @@ class _SearchResultsState extends State<SearchResults> {
     });
     List<Post> newList = await PostSerialize().searchDB(
         widget.searchString, pageLimit,
-        descending: true, orderBy: 'last_modified', startPoint: lastPost);
+        descending: descending, orderBy: 'last_modified', startPoint: lastPost);
     if (newList.isNotEmpty) {
       postList.addAll(newList);
       lastPost = [postList[postList.length - 1]];
@@ -76,92 +79,142 @@ class _SearchResultsState extends State<SearchResults> {
               scrollDirection: Axis.vertical,
               // dragStartBehavior: DragStartBehavior.down,
               child: Column(children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(left: 10),
-                  width: MediaQuery.of(context).size.width * widget.barWidth,
-                  decoration: const BoxDecoration(
-                    color: gray,
-                    // border: Border.all(),
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: TextField(
-                    controller: _controllerSearchBar,
-                    enabled: true,
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Enter Book Title, Author, or ISBN",
-                      floatingLabelAlignment: FloatingLabelAlignment.center,
-                      suffixIconConstraints: BoxConstraints(
-                          maxHeight: size.height * 0.2,
-                          maxWidth: size.width * 0.2),
-                      suffixIcon: Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        decoration: const BoxDecoration(
-                          color: gray,
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                        ),
-                        child: IconButton(
-                          onPressed: () async {
-                            //same as onSubmitted
-                            FocusScope.of(context).unfocus();
-                            if (currentSearchString.isNotEmpty) {
-                              FocusScope.of(context).unfocus();
-                              Navigator.of(context)
-                                  .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => SearchResults(
-                                            searchString: currentSearchString,
-                                          )));
-                            } else {
-                              /////pop up
-                              debugPrint("ERROR: Search String is empty");
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.search,
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: size.width * 0.065),
+                      child: Container(
+                          width: size.width * 0.10,
+                          decoration: const BoxDecoration(
+                              color: gray,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: PopupMenuButton(
+                            icon: const Icon(Icons.filter_alt),
+                            color: gray,
+                            tooltip: "Sorting Options",
+                            itemBuilder: ((context) {
+                              const Text("Sort By");
+                              return const [
+                                PopupMenuItem(child: Text("Date")),
+                                PopupMenuItem(child: Text("Price")),
+                                PopupMenuItem(child: Text("Condition")),
+                                PopupMenuItem(child: Text("Name")),
+                              ];
+                            }),
+                          )),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 10),
+                      width:
+                          MediaQuery.of(context).size.width * widget.barWidth,
+                      decoration: const BoxDecoration(
+                        color: gray,
+                        // border: Border.all(),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: TextField(
+                        controller: _controllerSearchBar,
+                        enabled: true,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Enter Book Title, Author, or ISBN",
+                          floatingLabelAlignment: FloatingLabelAlignment.center,
+                          suffixIconConstraints: BoxConstraints(
+                              maxHeight: size.height * 0.2,
+                              maxWidth: size.width * 0.2),
+                          suffixIcon: Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            decoration: const BoxDecoration(
+                              color: gray,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                            ),
+                            child: IconButton(
+                              onPressed: () async {
+                                //same as onSubmitted
+                                FocusScope.of(context).unfocus();
+                                if (currentSearchString.isNotEmpty) {
+                                  FocusScope.of(context).unfocus();
+                                  Navigator.of(context)
+                                      .pushReplacement(MaterialPageRoute(
+                                          builder: (context) => SearchResults(
+                                                searchString:
+                                                    currentSearchString,
+                                              )));
+                                  currentSearchString = currentSearchString;
+                                } else {
+                                  /////pop up
+                                  debugPrint("ERROR: Search String is empty");
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.search,
+                              ),
+                              padding: const EdgeInsets.all(0),
+                            ),
                           ),
-                          padding: const EdgeInsets.all(0),
                         ),
+                        onSubmitted: (String text) async {
+                          FocusScope.of(context).unfocus();
+                          if (currentSearchString.isNotEmpty) {
+                            Navigator.of(context)
+                                .pushReplacement(MaterialPageRoute(
+                                    builder: (context) => SearchResults(
+                                          searchString: currentSearchString,
+                                        )));
+                            currentSearchString = currentSearchString;
+                          } else {
+                            /////pop up
+                            debugPrint("ERROR: Search String is empty");
+                          }
+                        },
+                        onChanged: (String text) {
+                          currentSearchString = text;
+                        },
                       ),
                     ),
-                    onSubmitted: (String text) async {
-                      FocusScope.of(context).unfocus();
-                      if (currentSearchString.isNotEmpty) {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => SearchResults(
-                                  searchString: currentSearchString,
-                                )));
-                      } else {
-                        /////pop up
-                        debugPrint("ERROR: Search String is empty");
-                      }
-                    },
-                    onChanged: (String text) {
-                      currentSearchString = text;
-                    },
-                  ),
+                  ],
                 ),
                 Container(
                   padding: const EdgeInsets.all(22.0),
-                  height: 200,
                   child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
                       itemCount: postList.length,
-                      itemExtent: 200,
                       itemBuilder: ((context, index) {
-                        //leading: image
-                        //title: book_title
-                        //trailing: price
-                        return ListTile(
-                          leading: Image.network(postList[index].imageURL,
-                              fit: BoxFit.fill),
-                          title: Text(postList[index].bookName),
-                          tileColor: gray,
-                          trailing: Text("\$${postList[index].price}"),
-                          hoverColor: pink,
-                          textColor: Colors.black,
-                          //onTap: ,
+                        return Material(
+                          type: MaterialType.transparency,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: ListTile(
+                              //visualDensity: const VisualDensity(vertical: 4),
+                              leading: SizedBox(
+                                height: 300,
+                                child: Image.network(postList[index].imageURL,
+                                    //scale: 3.0,
+                                    fit: BoxFit.fill),
+                              ),
+                              title: Column(
+                                children: [
+                                  Text(postList[index].title),
+                                  Text(
+                                      "Book Name: ${postList[index].bookName}"),
+                                  Text(
+                                      "Condition: ${conditionToString[postList[index].condition]!}"),
+                                ],
+                              ),
+                              tileColor: gray,
+                              trailing: Text(postList[index].price,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              focusColor:
+                                  const Color.fromARGB(255, 83, 168, 238),
+                              textColor: Colors.black,
+                              onTap: () {}, /////
+                            ),
+                          ),
                         );
                       })),
                 ),

@@ -17,12 +17,6 @@ class BindrDrawer extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(top: 30),
             alignment: Alignment.center,
-            child: const Text(
-              "Hi <USERNAME FROM DATABASE HERE>!",
-              style: TextStyle(
-                  color: pink, fontSize: 15, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
           ),
           const SizedBox(
             height: 35,

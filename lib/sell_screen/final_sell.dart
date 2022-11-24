@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 class Confirm extends StatelessWidget {
   String cond;
   String price;
-  String post_title;
-  Object? book_name;
+  String postTitle;
+  Object? bookName;
   Object? author;
   Object? isbn;
   Object? pic;
@@ -33,8 +33,8 @@ class Confirm extends StatelessWidget {
   }
 
   Confirm({
-    required this.post_title,
-    required this.book_name,
+    required this.postTitle,
+    required this.bookName,
     required this.author,
     required this.pic,
     required this.isbn,
@@ -78,7 +78,7 @@ class Confirm extends StatelessWidget {
             Container(
                 alignment: Alignment.topCenter,
                 child: Text(
-                  post_title,
+                  postTitle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: pink, fontSize: 40),
                 )),
@@ -102,7 +102,7 @@ class Confirm extends StatelessWidget {
             Center(
               child: Text(
                 textAlign: TextAlign.center,
-                "Textbook: $book_name",
+                "Textbook: $bookName",
                 style: const TextStyle(
                     color: pink, fontSize: 30, fontWeight: FontWeight.bold),
               ),
@@ -141,7 +141,7 @@ class Confirm extends StatelessWidget {
                 int postID = await PostSerialize().newPostID();
                 Post entry = Post(
                   author: authorStr,
-                  bookName: book_name as String,
+                  bookName: bookName as String,
                   condition: con(cond),
                   dateCreated: Timestamp.fromDate(DateTime.now()),
                   description: description as String,
@@ -152,9 +152,9 @@ class Confirm extends StatelessWidget {
                   price: price,
                   postID: postID,
                   qAuthor: authorStr.toLowerCase(),
-                  qBookName: (book_name as String).toLowerCase(),
-                  qTitle: post_title.toLowerCase(),
-                  title: post_title,
+                  qBookName: (bookName as String).toLowerCase(),
+                  qTitle: postTitle.toLowerCase(),
+                  title: postTitle,
                   userID: FirebaseAuth.instance.currentUser!.uid,
                 );
                 entry.createEntry().then((value) {
