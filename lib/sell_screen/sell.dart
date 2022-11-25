@@ -121,7 +121,7 @@ class _SellScreenState extends State<SellScreen> {
                 description = value;
               }),
           rounded_input_field(
-            maxLength: 10,
+            maxLength: 7,
             hide: false,
             hintText: "ENTER PRICE",
             icon: Icons.attach_money,

@@ -184,6 +184,7 @@ class _SearchResultsState extends State<SearchResults> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           child: PopupMenuButton(
+                            offset: Offset(0, size.height * 0.05),
                             icon: const Icon(Icons.filter_alt),
                             color: gray,
                             tooltip: "Sorting Options",
@@ -475,12 +476,15 @@ class _SearchResultsState extends State<SearchResults> {
                                                           BorderRadius.all(
                                                               Radius.circular(
                                                                   10))),
-                                              trailing: Text(
-                                                  postList[index].price,
-                                                  textScaleFactor: 1.3,
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                              trailing: Column(
+                                                children: [
+                                                  Text(postList[index].price,
+                                                      textScaleFactor: 1.3,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold))
+                                                ],
+                                              ),
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),
                                               textColor: Colors.black,

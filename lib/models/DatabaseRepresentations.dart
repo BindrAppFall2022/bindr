@@ -90,9 +90,9 @@ class Post extends DBRepresentation<Post> {
       "condition": conditionToValue[condition]!,
       "last_modified": lastModified,
       "num_bookmarks": numBookmarks,
-      "price": double.parse(price.substring(
-        1,
-      )),
+      "price": double.parse(price.replaceAll(',', '').substring(
+            1,
+          )),
       "q_book_name": bookName.toLowerCase(),
       "q_title": title.toLowerCase(),
     };
