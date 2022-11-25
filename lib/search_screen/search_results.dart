@@ -1,4 +1,5 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
+import 'package:bindr_app/items/custom_popup_menu_item.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
@@ -6,17 +7,15 @@ import '../models/DatabaseRepresentations.dart';
 class SearchResults extends StatefulWidget {
   final String searchString;
   final double barWidth;
-  final int sortIndex;
   final bool descending;
-  final String orderBy;
+  final int currentFilterIndex;
 
   const SearchResults({
     super.key,
     required this.searchString,
     this.barWidth = .75,
-    this.sortIndex = 0,
     this.descending = true,
-    this.orderBy = 'last_modified',
+    this.currentFilterIndex = 0,
   });
 
   @override
@@ -27,9 +26,7 @@ class _SearchResultsState extends State<SearchResults> {
   final TextEditingController _controllerSearchBar = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  String currentSearchString = "";
-
-  int sortIndex = 0;
+  late String currentSearchString;
 
   int itemsPerLoad = 10; //num_items before loading more
 
@@ -40,6 +37,9 @@ class _SearchResultsState extends State<SearchResults> {
     "condition",
     "q_book_name"
   ];
+  List<Color> filterColors = [gray, gray, gray, gray];
+  late int currentFilterIndex;
+
   late String orderByKey;
   List<IconData> sortIconArr = [
     Icons.arrow_upward_sharp,
@@ -51,7 +51,7 @@ class _SearchResultsState extends State<SearchResults> {
   List<Object?> lastPost = [null];
   List<Post> postList = [];
   List<Post> fullData = [];
-  int curIndex = 0;
+  int curDataIndex = 0;
   @override
   SearchResults get widget => super.widget;
 
@@ -69,14 +69,14 @@ class _SearchResultsState extends State<SearchResults> {
         descending: descending, orderBy: orderByKey, startPoint: lastPost);
     if (newList.isNotEmpty) {
       fullData.addAll(newList);
-      fullData =
-          sortData(data: fullData, key: orderByKey, descending: descending);
+      sortData(key: orderByKey, descending: descending);
       if (fullData.length >= itemsPerLoad) {
-        postList.addAll(fullData.sublist(curIndex, curIndex + itemsPerLoad));
-        curIndex += itemsPerLoad;
+        postList.addAll(
+            fullData.sublist(curDataIndex, curDataIndex + itemsPerLoad));
+        curDataIndex += itemsPerLoad;
       } else {
         postList.addAll(fullData);
-        curIndex += fullData.length;
+        curDataIndex += fullData.length;
       }
       // lastPost = [
       //   {orderByKey: postList[postList.length - 1].toMap()[orderByKey]}
@@ -99,13 +99,14 @@ class _SearchResultsState extends State<SearchResults> {
         ? []
         : () {
             List<Post> tempList;
-            if (fullData.length - curIndex >= itemsPerLoad) {
-              tempList = fullData.sublist(curIndex, curIndex + itemsPerLoad);
-              curIndex += itemsPerLoad;
+            if (fullData.length - curDataIndex >= itemsPerLoad) {
+              tempList =
+                  fullData.sublist(curDataIndex, curDataIndex + itemsPerLoad);
+              curDataIndex += itemsPerLoad;
             } else {
-              tempList = fullData.sublist(
-                  curIndex, curIndex + (fullData.length - curIndex));
-              curIndex += fullData.length - curIndex;
+              tempList = fullData.sublist(curDataIndex,
+                  curDataIndex + (fullData.length - curDataIndex));
+              curDataIndex += fullData.length - curDataIndex;
             }
             return tempList;
           }();
@@ -121,22 +122,19 @@ class _SearchResultsState extends State<SearchResults> {
   @override
   void initState() {
     super.initState();
-    currentSearchString = widget.searchString;
-    sortIndex = widget.sortIndex;
+    currentSearchString = widget.searchString.toLowerCase();
     descending = widget.descending;
-    orderByKey = widget.orderBy;
-    if (descending) {
-      sortIcon = Icons.arrow_downward_sharp;
-    } else {
-      sortIcon = Icons.arrow_upward_sharp;
-    }
+    currentFilterIndex = widget.currentFilterIndex;
+    filterColors[currentFilterIndex] = Colors.blue;
+    orderByKey = orderByArray[currentFilterIndex];
+    sortIcon =
+        (descending) ? Icons.arrow_downward_sharp : Icons.arrow_upward_sharp;
     sortIcon = (descending) ? sortIconArr[1] : sortIconArr[0];
     fetchDataInit();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
           !loading) {
-        // print("NEW DATA CALLED");
         fetchData();
       }
     });
@@ -149,10 +147,14 @@ class _SearchResultsState extends State<SearchResults> {
     _scrollController.dispose();
   }
 
-  sortData(
-      {required List<Post> data,
-      required String key,
-      required bool descending}) {}
+  sortData({required String key, required bool descending}) {
+    fullData
+        .sort(((a, b) => a.toMapComparable()[key]!.compareTo(b.toMap()[key])));
+    if (descending) {
+      fullData = fullData.reversed.toList();
+    }
+    postList = fullData.sublist(0, curDataIndex);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -185,11 +187,71 @@ class _SearchResultsState extends State<SearchResults> {
                             tooltip: "Sorting Options",
                             itemBuilder: ((context) {
                               const Text("Sort By");
-                              return const [
-                                PopupMenuItem(child: Text("Date")),
-                                PopupMenuItem(child: Text("Price")),
-                                PopupMenuItem(child: Text("Condition")),
-                                PopupMenuItem(child: Text("Name")),
+                              return [
+                                CustomPopupMenuItem(
+                                  color: filterColors[0],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[0];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 0;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Date"),
+                                ),
+                                CustomPopupMenuItem(
+                                  color: filterColors[1],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[1];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 1;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Price"),
+                                ),
+                                CustomPopupMenuItem(
+                                  color: filterColors[2],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[2];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 2;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Condition"),
+                                ),
+                                CustomPopupMenuItem(
+                                  color: filterColors[3],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[3];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 3;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Name"),
+                                ),
                               ];
                             }),
                           )),
@@ -207,11 +269,12 @@ class _SearchResultsState extends State<SearchResults> {
                           child: IconButton(
                               onPressed: () {
                                 setState(() {
-                                  print(_scrollController.position.pixels);
                                   descending = !descending;
                                   sortIcon = (descending)
                                       ? sortIconArr[1]
                                       : sortIconArr[0];
+                                  sortData(
+                                      key: orderByKey, descending: descending);
                                 });
                               },
                               icon: Icon(sortIcon))),
@@ -255,6 +318,9 @@ class _SearchResultsState extends State<SearchResults> {
                                           builder: (context) => SearchResults(
                                                 searchString:
                                                     currentSearchString,
+                                                currentFilterIndex:
+                                                    currentFilterIndex,
+                                                descending: descending,
                                               )));
                                   currentSearchString = currentSearchString;
                                 } else {
@@ -296,8 +362,6 @@ class _SearchResultsState extends State<SearchResults> {
                       return Container(
                           padding: const EdgeInsets.all(22.0),
                           child: ListView.separated(
-                            // controller: _scrollController,
-                            // scrollDirection: Axis.vertical,
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemCount: postList.length,
@@ -309,7 +373,7 @@ class _SearchResultsState extends State<SearchResults> {
                                   child: ListTile(
                                     //visualDensity: const VisualDensity(vertical: 4),
                                     leading: SizedBox(
-                                      height: 100,
+                                      height: 150,
                                       child: Image.network(
                                           postList[index].imageURL,
                                           //scale: 3.0,

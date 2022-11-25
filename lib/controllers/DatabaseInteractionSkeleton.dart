@@ -34,12 +34,14 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
       if (query is Query) {
         Query<Object?>? q1;
         if (startPoint[0] != null) {
-          q1 = query
-              .limit(pageLimit)
-              .orderBy(orderBy, descending: descending)
-              .startAfter(startPoint);
+          q1 = query;
+          //.limit(pageLimit)
+          // .orderBy(orderBy, descending: descending)
+          //.startAfter(startPoint);
         } else {
-          q1 = query.limit(pageLimit).orderBy(orderBy, descending: descending);
+          q1 = query;
+          //.limit(pageLimit)
+          // .orderBy(orderBy, descending: descending);
         }
         await q1.get().then((value) {
           resultSnapshot = value;
