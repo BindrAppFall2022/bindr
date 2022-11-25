@@ -96,7 +96,6 @@ class Post extends DBRepresentation<Post> {
       "q_book_name": bookName.toLowerCase(),
       "q_title": title.toLowerCase(),
     };
-    print("price: ${tomap["price"]}");
     return tomap;
   }
 

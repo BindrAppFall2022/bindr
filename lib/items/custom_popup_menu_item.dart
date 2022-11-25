@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomPopupMenuItem<T> extends PopupMenuItem<T> {
   final Color color;
+  final IconData? iconData;
 
   const CustomPopupMenuItem({
     Key? key,
@@ -9,6 +10,7 @@ class CustomPopupMenuItem<T> extends PopupMenuItem<T> {
     void Function()? onTap,
     bool enabled = true,
     required Widget child,
+    this.iconData,
     required this.color,
   }) : super(
             key: key,
@@ -26,8 +28,15 @@ class _CustomPopupMenuItemState<T>
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: super.build(context),
       color: widget.color,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Icon(
+          size: 30,
+          widget.iconData,
+          color: Colors.black,
+        ),
+        super.build(context)
+      ]),
     );
   }
 }

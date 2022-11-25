@@ -1,5 +1,6 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/custom_popup_menu_item.dart';
+import 'package:bindr_app/items/rounded_button.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
@@ -88,13 +89,14 @@ class _SearchResultsState extends State<SearchResults> {
     });
   }
 
-  fetchData() {
+  fetchData() async {
     if (finishedLoading) {
       return;
     }
     setState(() {
       loading = true;
     });
+    await Future.delayed(const Duration(milliseconds: 200));
     List<Post> newList = postList.length >= pageLimit
         ? []
         : () {
@@ -144,7 +146,7 @@ class _SearchResultsState extends State<SearchResults> {
   void dispose() {
     super.dispose();
     _controllerSearchBar.dispose();
-    _scrollController.dispose();
+    //_scrollController.dispose();
   }
 
   sortData({required String key, required bool descending}) {
@@ -190,6 +192,7 @@ class _SearchResultsState extends State<SearchResults> {
                               return [
                                 CustomPopupMenuItem(
                                   color: filterColors[0],
+                                  iconData: Icons.calendar_month,
                                   onTap: () {
                                     setState(() {
                                       orderByKey = orderByArray[0];
@@ -206,6 +209,7 @@ class _SearchResultsState extends State<SearchResults> {
                                 ),
                                 CustomPopupMenuItem(
                                   color: filterColors[1],
+                                  iconData: Icons.attach_money,
                                   onTap: () {
                                     setState(() {
                                       orderByKey = orderByArray[1];
@@ -222,6 +226,7 @@ class _SearchResultsState extends State<SearchResults> {
                                 ),
                                 CustomPopupMenuItem(
                                   color: filterColors[2],
+                                  iconData: Icons.label,
                                   onTap: () {
                                     setState(() {
                                       orderByKey = orderByArray[2];
@@ -238,6 +243,7 @@ class _SearchResultsState extends State<SearchResults> {
                                 ),
                                 CustomPopupMenuItem(
                                   color: filterColors[3],
+                                  iconData: Icons.title,
                                   onTap: () {
                                     setState(() {
                                       orderByKey = orderByArray[3];
@@ -361,61 +367,89 @@ class _SearchResultsState extends State<SearchResults> {
                     if (postList.isNotEmpty || finishedLoading == false) {
                       return Container(
                           padding: const EdgeInsets.all(20.0),
-                          child: ListView.separated(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: postList.length,
-                            itemBuilder: ((context, index) {
-                              return Material(
-                                type: MaterialType.transparency,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 5),
-                                  child: Stack(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 15.0),
-                                        child: Image.network(
-                                          postList[index].imageURL,
-                                          height: 140,
-                                          width: 120,
-                                        ),
-                                      ),
-                                      ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                            minHeight: 170),
-                                        child: ListTile(
-                                          leading: const Padding(
-                                            padding: EdgeInsets.only(
-                                              left: 60,
+                          child: Stack(children: [
+                            ListView.separated(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount:
+                                  postList.length + ((finishedLoading) ? 1 : 0),
+                              itemBuilder: ((context, index) {
+                                if (index < postList.length) {
+                                  return Material(
+                                    type: MaterialType.transparency,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: Stack(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 15.0),
+                                            child: Image.network(
+                                              postList[index].imageURL,
+                                              height: 140,
+                                              width: 120,
                                             ),
                                           ),
-                                          title: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20.0),
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  postList[index].title,
-                                                  maxLines: 3,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  textScaleFactor: 1.5,
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                          ConstrainedBox(
+                                            constraints: const BoxConstraints(
+                                                minHeight: 170),
+                                            child: ListTile(
+                                              leading: const Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 60,
                                                 ),
-                                                RichText(
-                                                  maxLines: 3,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  textScaleFactor: 1.15,
-                                                  textAlign: TextAlign.center,
-                                                  text: TextSpan(
-                                                    children: <TextSpan>[
+                                              ),
+                                              title: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 20.0),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      postList[index].title,
+                                                      maxLines: 3,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      textScaleFactor: 1.5,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    RichText(
+                                                      maxLines: 3,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      textScaleFactor: 1.15,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      text: TextSpan(
+                                                        children: <TextSpan>[
+                                                          const TextSpan(
+                                                              text: "Book: ",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                          TextSpan(
+                                                              text: postList[
+                                                                      index]
+                                                                  .bookName,
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .black))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    RichText(
+                                                        text:
+                                                            TextSpan(children: <
+                                                                TextSpan>[
                                                       const TextSpan(
-                                                          text: "Book: ",
+                                                          text: "Condition: ",
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.black,
@@ -423,57 +457,84 @@ class _SearchResultsState extends State<SearchResults> {
                                                                   FontWeight
                                                                       .bold)),
                                                       TextSpan(
-                                                          text: postList[index]
-                                                              .bookName,
+                                                          text: conditionToString[
+                                                              postList[index]
+                                                                  .condition]!,
                                                           style:
                                                               const TextStyle(
                                                                   color: Colors
                                                                       .black))
-                                                    ],
-                                                  ),
+                                                    ])),
+                                                  ],
                                                 ),
-                                                RichText(
-                                                    text: TextSpan(children: <
-                                                        TextSpan>[
-                                                  const TextSpan(
-                                                      text: "Condition: ",
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.bold)),
-                                                  TextSpan(
-                                                      text: conditionToString[
-                                                          postList[index]
-                                                              .condition]!,
-                                                      style: const TextStyle(
-                                                          color: Colors.black))
-                                                ])),
-                                              ],
+                                              ),
+                                              tileColor: gray,
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  10))),
+                                              trailing: Text(
+                                                  postList[index].price,
+                                                  textScaleFactor: 1.3,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                              focusColor: const Color.fromARGB(
+                                                  255, 83, 168, 238),
+                                              textColor: Colors.black,
+                                              onTap: () {}, /////
                                             ),
                                           ),
-                                          tileColor: gray,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10))),
-                                          trailing: Text(postList[index].price,
-                                              textScaleFactor: 1.3,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold)),
-                                          focusColor: const Color.fromARGB(
-                                              255, 83, 168, 238),
-                                          textColor: Colors.black,
-                                          onTap: () {}, /////
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                            separatorBuilder: (context, index) => const Divider(
-                              height: 10,
+                                    ),
+                                  );
+                                } else {
+                                  return SizedBox(
+                                    width: constraints.maxWidth,
+                                    height: 150,
+                                    child: Center(
+                                        child: Column(
+                                      children: [
+                                        const Text(
+                                          "End of Results",
+                                          style: TextStyle(
+                                              fontSize: 35,
+                                              fontWeight: FontWeight.bold,
+                                              color: pink),
+                                        ),
+                                        RoundButton(
+                                            text: "Go Back to Top",
+                                            press: () {
+                                              _scrollController.animateTo(0,
+                                                  duration: const Duration(
+                                                      milliseconds: 400),
+                                                  curve: Curves.linear);
+                                            })
+                                      ],
+                                    )),
+                                  );
+                                }
+                              }),
+                              separatorBuilder: (context, index) =>
+                                  const Divider(
+                                height: 10,
+                              ),
                             ),
-                          ));
+                            if (loading) ...[
+                              Positioned(
+                                  left: 0,
+                                  bottom: 0,
+                                  child: SizedBox(
+                                      width: constraints.maxWidth,
+                                      height: 80,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(),
+                                      )))
+                            ],
+                          ]));
                     } else {
                       return Column(children: [
                         Padding(
