@@ -65,7 +65,7 @@ class _SearchResultsState extends State<SearchResults> {
       loading = true;
     });
     List<Post> newList = await PostSerialize().searchDB(
-        widget.searchString, pageLimit,
+        currentSearchString, pageLimit,
         descending: descending, orderBy: orderByKey, startPoint: lastPost);
     if (newList.isNotEmpty) {
       fullData.addAll(newList);
@@ -312,7 +312,6 @@ class _SearchResultsState extends State<SearchResults> {
                                 //same as onSubmitted
                                 FocusScope.of(context).unfocus();
                                 if (currentSearchString.isNotEmpty) {
-                                  FocusScope.of(context).unfocus();
                                   Navigator.of(context)
                                       .pushReplacement(MaterialPageRoute(
                                           builder: (context) => SearchResults(
@@ -322,7 +321,6 @@ class _SearchResultsState extends State<SearchResults> {
                                                     currentFilterIndex,
                                                 descending: descending,
                                               )));
-                                  currentSearchString = currentSearchString;
                                 } else {
                                   /////pop up
                                   debugPrint("ERROR: Search String is empty");
@@ -342,8 +340,10 @@ class _SearchResultsState extends State<SearchResults> {
                                 .pushReplacement(MaterialPageRoute(
                                     builder: (context) => SearchResults(
                                           searchString: currentSearchString,
+                                          currentFilterIndex:
+                                              currentFilterIndex,
+                                          descending: descending,
                                         )));
-                            currentSearchString = currentSearchString;
                           } else {
                             /////pop up
                             debugPrint("ERROR: Search String is empty");
@@ -360,7 +360,7 @@ class _SearchResultsState extends State<SearchResults> {
                   builder: (context, constraints) {
                     if (postList.isNotEmpty || finishedLoading == false) {
                       return Container(
-                          padding: const EdgeInsets.all(22.0),
+                          padding: const EdgeInsets.all(20.0),
                           child: ListView.separated(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -370,77 +370,102 @@ class _SearchResultsState extends State<SearchResults> {
                                 type: MaterialType.transparency,
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 5),
-                                  child: ListTile(
-                                    //visualDensity: const VisualDensity(vertical: 4),
-                                    leading: SizedBox(
-                                      height: 150,
-                                      child: Image.network(
+                                  child: Stack(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: Image.network(
                                           postList[index].imageURL,
-                                          //scale: 3.0,
-                                          fit: BoxFit.fill),
-                                    ),
-                                    title: Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 20.0),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            postList[index].title,
-                                            textScaleFactor: 1.5,
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                          height: 140,
+                                          width: 120,
+                                        ),
+                                      ),
+                                      ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                            minHeight: 170),
+                                        child: ListTile(
+                                          leading: const Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 60,
                                             ),
                                           ),
-                                          RichText(
-                                            textScaleFactor: 1.15,
-                                            textAlign: TextAlign.center,
-                                            text: TextSpan(
-                                              children: <TextSpan>[
-                                                const TextSpan(
-                                                    text: "Book: ",
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                                TextSpan(
-                                                    text: postList[index]
-                                                        .bookName,
-                                                    style: const TextStyle(
-                                                        color: Colors.black))
+                                          title: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 20.0),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  postList[index].title,
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textScaleFactor: 1.5,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                RichText(
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textScaleFactor: 1.15,
+                                                  textAlign: TextAlign.center,
+                                                  text: TextSpan(
+                                                    children: <TextSpan>[
+                                                      const TextSpan(
+                                                          text: "Book: ",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      TextSpan(
+                                                          text: postList[index]
+                                                              .bookName,
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black))
+                                                    ],
+                                                  ),
+                                                ),
+                                                RichText(
+                                                    text: TextSpan(children: <
+                                                        TextSpan>[
+                                                  const TextSpan(
+                                                      text: "Condition: ",
+                                                      style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  TextSpan(
+                                                      text: conditionToString[
+                                                          postList[index]
+                                                              .condition]!,
+                                                      style: const TextStyle(
+                                                          color: Colors.black))
+                                                ])),
                                               ],
                                             ),
                                           ),
-                                          RichText(
-                                              text:
-                                                  TextSpan(children: <TextSpan>[
-                                            const TextSpan(
-                                                text: "Condition: ",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            TextSpan(
-                                                text: conditionToString[
-                                                    postList[index].condition]!,
-                                                style: const TextStyle(
-                                                    color: Colors.black))
-                                          ])),
-                                        ],
+                                          tileColor: gray,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          trailing: Text(postList[index].price,
+                                              textScaleFactor: 1.3,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          focusColor: const Color.fromARGB(
+                                              255, 83, 168, 238),
+                                          textColor: Colors.black,
+                                          onTap: () {}, /////
+                                        ),
                                       ),
-                                    ),
-                                    tileColor: gray,
-                                    shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    trailing: Text(postList[index].price,
-                                        textScaleFactor: 1.3,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    focusColor:
-                                        const Color.fromARGB(255, 83, 168, 238),
-                                    textColor: Colors.black,
-                                    onTap: () {}, /////
+                                    ],
                                   ),
                                 ),
                               );
