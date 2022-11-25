@@ -78,7 +78,23 @@ class Post extends DBRepresentation<Post> {
       "title": title,
       "userid": userID
     };
-    //on update, don't change dateAdded
+    //on update, don't change date_created
+    if (dateCreated is! Timestamp) {
+      tomap.remove("date_created");
+    }
+    return tomap;
+  }
+
+  Map<String, Comparable> toMapComparable() {
+    Map<String, Comparable> tomap = <String, Comparable>{
+      "condition": conditionToValue[condition]!,
+      "last_modified": lastModified,
+      "num_bookmarks": numBookmarks,
+      "price": price,
+      "q_book_name": bookName.toLowerCase(),
+      "q_title": title.toLowerCase(),
+    };
+    //on update, don't change date_created
     if (dateCreated is! Timestamp) {
       tomap.remove("date_created");
     }

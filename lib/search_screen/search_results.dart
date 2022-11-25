@@ -1,17 +1,21 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
+import 'package:bindr_app/items/custom_popup_menu_item.dart';
 import 'package:flutter/material.dart';
-
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
 
 class SearchResults extends StatefulWidget {
   final String searchString;
   final double barWidth;
+  final bool descending;
+  final int currentFilterIndex;
 
   const SearchResults({
     super.key,
     required this.searchString,
     this.barWidth = .75,
+    this.descending = true,
+    this.currentFilterIndex = 0,
   });
 
   @override
@@ -19,25 +23,41 @@ class SearchResults extends StatefulWidget {
 }
 
 class _SearchResultsState extends State<SearchResults> {
-  final _controllerSearchBar = TextEditingController();
+  final TextEditingController _controllerSearchBar = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  String currentSearchString = "";
+  late String currentSearchString;
 
-  String sortDate = 'new';
-  int sortIndex = 0;
-  List<String> sortArray = ["Date", "Price"];
-  String sortPrice = '';
+  int itemsPerLoad = 10; //num_items before loading more
+
+  late IconData sortIcon;
+  List<String> orderByArray = [
+    "last_modified",
+    "price",
+    "condition",
+    "q_book_name"
+  ];
+  List<Color> filterColors = [gray, gray, gray, gray];
+  late int currentFilterIndex;
+
+  late String orderByKey;
+  List<IconData> sortIconArr = [
+    Icons.arrow_upward_sharp,
+    Icons.arrow_downward_sharp,
+  ];
 
   bool descending = true;
 
   List<Object?> lastPost = [null];
   List<Post> postList = [];
-
+  List<Post> fullData = [];
+  int curDataIndex = 0;
   @override
   SearchResults get widget => super.widget;
 
   bool loading = false, finishedLoading = false;
-  fetchData() async {
+
+  fetchDataInit() async {
     if (finishedLoading) {
       return;
     }
@@ -45,11 +65,53 @@ class _SearchResultsState extends State<SearchResults> {
       loading = true;
     });
     List<Post> newList = await PostSerialize().searchDB(
-        widget.searchString, pageLimit,
-        descending: descending, orderBy: 'last_modified', startPoint: lastPost);
+        currentSearchString, pageLimit,
+        descending: descending, orderBy: orderByKey, startPoint: lastPost);
+    if (newList.isNotEmpty) {
+      fullData.addAll(newList);
+      sortData(key: orderByKey, descending: descending);
+      if (fullData.length >= itemsPerLoad) {
+        postList.addAll(
+            fullData.sublist(curDataIndex, curDataIndex + itemsPerLoad));
+        curDataIndex += itemsPerLoad;
+      } else {
+        postList.addAll(fullData);
+        curDataIndex += fullData.length;
+      }
+      // lastPost = [
+      //   {orderByKey: postList[postList.length - 1].toMap()[orderByKey]}
+      // ];
+    }
+    setState(() {
+      loading = false;
+      finishedLoading = newList.isEmpty;
+    });
+  }
+
+  fetchData() {
+    if (finishedLoading) {
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    List<Post> newList = postList.length >= pageLimit
+        ? []
+        : () {
+            List<Post> tempList;
+            if (fullData.length - curDataIndex >= itemsPerLoad) {
+              tempList =
+                  fullData.sublist(curDataIndex, curDataIndex + itemsPerLoad);
+              curDataIndex += itemsPerLoad;
+            } else {
+              tempList = fullData.sublist(curDataIndex,
+                  curDataIndex + (fullData.length - curDataIndex));
+              curDataIndex += fullData.length - curDataIndex;
+            }
+            return tempList;
+          }();
     if (newList.isNotEmpty) {
       postList.addAll(newList);
-      lastPost = [postList[postList.length - 1]];
     }
     setState(() {
       loading = false;
@@ -60,8 +122,38 @@ class _SearchResultsState extends State<SearchResults> {
   @override
   void initState() {
     super.initState();
-    currentSearchString = widget.searchString;
-    fetchData();
+    currentSearchString = widget.searchString.toLowerCase();
+    descending = widget.descending;
+    currentFilterIndex = widget.currentFilterIndex;
+    filterColors[currentFilterIndex] = Colors.blue;
+    orderByKey = orderByArray[currentFilterIndex];
+    sortIcon =
+        (descending) ? Icons.arrow_downward_sharp : Icons.arrow_upward_sharp;
+    sortIcon = (descending) ? sortIconArr[1] : sortIconArr[0];
+    fetchDataInit();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent &&
+          !loading) {
+        fetchData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controllerSearchBar.dispose();
+    _scrollController.dispose();
+  }
+
+  sortData({required String key, required bool descending}) {
+    fullData
+        .sort(((a, b) => a.toMapComparable()[key]!.compareTo(b.toMap()[key])));
+    if (descending) {
+      fullData = fullData.reversed.toList();
+    }
+    postList = fullData.sublist(0, curDataIndex);
   }
 
   @override
@@ -76,8 +168,8 @@ class _SearchResultsState extends State<SearchResults> {
             ),
             backgroundColor: Theme.of(context).primaryColor,
             body: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              // dragStartBehavior: DragStartBehavior.down,
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Column(children: <Widget>[
                 Row(
                   children: [
@@ -95,19 +187,103 @@ class _SearchResultsState extends State<SearchResults> {
                             tooltip: "Sorting Options",
                             itemBuilder: ((context) {
                               const Text("Sort By");
-                              return const [
-                                PopupMenuItem(child: Text("Date")),
-                                PopupMenuItem(child: Text("Price")),
-                                PopupMenuItem(child: Text("Condition")),
-                                PopupMenuItem(child: Text("Name")),
+                              return [
+                                CustomPopupMenuItem(
+                                  color: filterColors[0],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[0];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 0;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Date"),
+                                ),
+                                CustomPopupMenuItem(
+                                  color: filterColors[1],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[1];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 1;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Price"),
+                                ),
+                                CustomPopupMenuItem(
+                                  color: filterColors[2],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[2];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 2;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Condition"),
+                                ),
+                                CustomPopupMenuItem(
+                                  color: filterColors[3],
+                                  onTap: () {
+                                    setState(() {
+                                      orderByKey = orderByArray[3];
+                                      sortData(
+                                          key: orderByKey,
+                                          descending: descending);
+                                      filterColors[currentFilterIndex] = gray;
+                                      currentFilterIndex = 3;
+                                      filterColors[currentFilterIndex] =
+                                          Colors.blue;
+                                    });
+                                  },
+                                  child: const Text("Name"),
+                                ),
                               ];
                             }),
                           )),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(left: size.width * 0.025),
+                      child: Container(
+                          width: size.width * 0.10,
+                          decoration: BoxDecoration(
+                              color: (descending == true)
+                                  ? const Color.fromARGB(255, 185, 51, 41)
+                                  : const Color.fromARGB(255, 68, 171, 255),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(10))),
+                          child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  descending = !descending;
+                                  sortIcon = (descending)
+                                      ? sortIconArr[1]
+                                      : sortIconArr[0];
+                                  sortData(
+                                      key: orderByKey, descending: descending);
+                                });
+                              },
+                              icon: Icon(sortIcon))),
+                    ),
                     Container(
                       margin: const EdgeInsets.only(left: 10),
-                      width:
-                          MediaQuery.of(context).size.width * widget.barWidth,
+                      width: MediaQuery.of(context).size.width *
+                          widget.barWidth *
+                          0.85,
                       decoration: const BoxDecoration(
                         color: gray,
                         // border: Border.all(),
@@ -136,14 +312,15 @@ class _SearchResultsState extends State<SearchResults> {
                                 //same as onSubmitted
                                 FocusScope.of(context).unfocus();
                                 if (currentSearchString.isNotEmpty) {
-                                  FocusScope.of(context).unfocus();
                                   Navigator.of(context)
                                       .pushReplacement(MaterialPageRoute(
                                           builder: (context) => SearchResults(
                                                 searchString:
                                                     currentSearchString,
+                                                currentFilterIndex:
+                                                    currentFilterIndex,
+                                                descending: descending,
                                               )));
-                                  currentSearchString = currentSearchString;
                                 } else {
                                   /////pop up
                                   debugPrint("ERROR: Search String is empty");
@@ -163,8 +340,10 @@ class _SearchResultsState extends State<SearchResults> {
                                 .pushReplacement(MaterialPageRoute(
                                     builder: (context) => SearchResults(
                                           searchString: currentSearchString,
+                                          currentFilterIndex:
+                                              currentFilterIndex,
+                                          descending: descending,
                                         )));
-                            currentSearchString = currentSearchString;
                           } else {
                             /////pop up
                             debugPrint("ERROR: Search String is empty");
@@ -177,46 +356,141 @@ class _SearchResultsState extends State<SearchResults> {
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.all(22.0),
-                  child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: postList.length,
-                      itemBuilder: ((context, index) {
-                        return Material(
-                          type: MaterialType.transparency,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 5),
-                            child: ListTile(
-                              //visualDensity: const VisualDensity(vertical: 4),
-                              leading: SizedBox(
-                                height: 300,
-                                child: Image.network(postList[index].imageURL,
-                                    //scale: 3.0,
-                                    fit: BoxFit.fill),
-                              ),
-                              title: Column(
-                                children: [
-                                  Text(postList[index].title),
-                                  Text(
-                                      "Book Name: ${postList[index].bookName}"),
-                                  Text(
-                                      "Condition: ${conditionToString[postList[index].condition]!}"),
-                                ],
-                              ),
-                              tileColor: gray,
-                              trailing: Text(postList[index].price,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              focusColor:
-                                  const Color.fromARGB(255, 83, 168, 238),
-                              textColor: Colors.black,
-                              onTap: () {}, /////
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (postList.isNotEmpty || finishedLoading == false) {
+                      return Container(
+                          padding: const EdgeInsets.all(20.0),
+                          child: ListView.separated(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: postList.length,
+                            itemBuilder: ((context, index) {
+                              return Material(
+                                type: MaterialType.transparency,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: Stack(
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: Image.network(
+                                          postList[index].imageURL,
+                                          height: 140,
+                                          width: 120,
+                                        ),
+                                      ),
+                                      ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                            minHeight: 170),
+                                        child: ListTile(
+                                          leading: const Padding(
+                                            padding: EdgeInsets.only(
+                                              left: 60,
+                                            ),
+                                          ),
+                                          title: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 20.0),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  postList[index].title,
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textScaleFactor: 1.5,
+                                                  textAlign: TextAlign.center,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                RichText(
+                                                  maxLines: 3,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textScaleFactor: 1.15,
+                                                  textAlign: TextAlign.center,
+                                                  text: TextSpan(
+                                                    children: <TextSpan>[
+                                                      const TextSpan(
+                                                          text: "Book: ",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      TextSpan(
+                                                          text: postList[index]
+                                                              .bookName,
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black))
+                                                    ],
+                                                  ),
+                                                ),
+                                                RichText(
+                                                    text: TextSpan(children: <
+                                                        TextSpan>[
+                                                  const TextSpan(
+                                                      text: "Condition: ",
+                                                      style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  TextSpan(
+                                                      text: conditionToString[
+                                                          postList[index]
+                                                              .condition]!,
+                                                      style: const TextStyle(
+                                                          color: Colors.black))
+                                                ])),
+                                              ],
+                                            ),
+                                          ),
+                                          tileColor: gray,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          trailing: Text(postList[index].price,
+                                              textScaleFactor: 1.3,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          focusColor: const Color.fromARGB(
+                                              255, 83, 168, 238),
+                                          textColor: Colors.black,
+                                          onTap: () {}, /////
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                            separatorBuilder: (context, index) => const Divider(
+                              height: 10,
                             ),
-                          ),
-                        );
-                      })),
+                          ));
+                    } else {
+                      return Column(children: [
+                        Padding(
+                            padding: const EdgeInsets.only(left: 8.0, top: 40),
+                            child: Text(
+                              "No search results found for \"${widget.searchString}\", please consider changing your query.",
+                              textScaleFactor: 2,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: pink),
+                            )),
+                        Icon(
+                          Icons.search_off_sharp,
+                          size: size.height * 0.4,
+                        )
+                      ]);
+                    }
+                  },
                 ),
               ]),
             )));

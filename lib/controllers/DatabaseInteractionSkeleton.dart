@@ -17,14 +17,14 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
 
     Query current = coll;
     Query? currentR;
-    String lastKey = "";
     queries.forEach((key, value) {
-      lastKey = key;
       String valueR = value.split('').reversed.join('');
       currentR = current
+          .orderBy(key)
           .where(key, isGreaterThanOrEqualTo: valueR)
           .where(key, isLessThanOrEqualTo: "$valueR~");
       current = current
+          .orderBy(key)
           .where(key, isGreaterThanOrEqualTo: value)
           .where(key, isLessThanOrEqualTo: "$value~");
     });
@@ -32,13 +32,16 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
     List<T> result = [];
     for (Query? query in [current, currentR]) {
       if (query is Query) {
-        var q1 = query
-            .limit(pageLimit)
-            //first orderBy has to be same as last key
-            .orderBy(lastKey, descending: true)
-            .orderBy(orderBy, descending: descending);
+        Query<Object?>? q1;
         if (startPoint[0] != null) {
-          q1 = q1.startAfter(startPoint);
+          q1 = query;
+          //.limit(pageLimit)
+          // .orderBy(orderBy, descending: descending)
+          //.startAfter(startPoint);
+        } else {
+          q1 = query;
+          //.limit(pageLimit)
+          // .orderBy(orderBy, descending: descending);
         }
         await q1.get().then((value) {
           resultSnapshot = value;
@@ -113,7 +116,12 @@ class PostSerialize extends DBSerialize<Post> {
           orderBy: orderBy, descending: descending, startPoint: startPoint);
       result.addAll(curList);
     }
-    return result.toList();
+    List<Post> resultList = result.toList();
+    if (result.length <= pageLimit) {
+      return resultList;
+    } else {
+      return resultList.sublist(0, pageLimit);
+    }
   }
 
   @override
