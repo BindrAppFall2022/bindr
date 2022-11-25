@@ -148,8 +148,8 @@ class _SearchResultsState extends State<SearchResults> {
   }
 
   sortData({required String key, required bool descending}) {
-    fullData
-        .sort(((a, b) => a.toMapComparable()[key]!.compareTo(b.toMap()[key])));
+    fullData.sort(((a, b) =>
+        a.toMapComparable()[key]!.compareTo(b.toMapComparable()[key])));
     if (descending) {
       fullData = fullData.reversed.toList();
     }
