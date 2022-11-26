@@ -9,42 +9,29 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
   String getCollection();
   T? createFrom(Map<String, dynamic> map);
 
-  Future<List<T>> getEntries(Map<String, String> queries, int pageLimit,
-      {required String orderBy,
-      required bool descending,
-      required List<Object?> startPoint}) async {
-    CollectionReference coll =
-        FirebaseFirestore.instance.collection(getCollection());
+  Future<List<T>> getEntries(
+    String key,
+    String value,
+    int? pageLimit, {
+    String? orderBy,
+    bool? descending,
+    List<Object?>? startPoint,
+    Query? q,
+  }) async {
+    Query current = (q is Query)
+        ? q
+        : FirebaseFirestore.instance.collection(getCollection());
 
-    Query current = coll;
-    Query? currentR;
-    queries.forEach((key, value) {
-      String valueR = value.split('').reversed.join('');
-      currentR = current
-          .orderBy(key)
-          .where(key, isGreaterThanOrEqualTo: valueR)
-          .where(key, isLessThanOrEqualTo: "$valueR~");
-      current = current
-          .orderBy(key)
-          .where(key, isGreaterThanOrEqualTo: value)
-          .where(key, isLessThanOrEqualTo: "$value~");
-    });
+    current = current
+        .orderBy(key)
+        .where(key, isGreaterThanOrEqualTo: value)
+        .where(key, isLessThanOrEqualTo: "$value~");
+
     QuerySnapshot resultSnapshot;
     List<T> result = [];
-    for (Query? query in [current, currentR]) {
+    for (Query? query in [current]) {
       if (query is Query) {
-        Query<Object?>? q1;
-        if (startPoint[0] != null) {
-          q1 = query;
-          //.limit(pageLimit)
-          // .orderBy(orderBy, descending: descending)
-          //.startAfter(startPoint);
-        } else {
-          q1 = query;
-          //.limit(pageLimit)
-          // .orderBy(orderBy, descending: descending);
-        }
-        await q1.get().then((value) {
+        await query.get().then((value) {
           resultSnapshot = value;
           for (var element in resultSnapshot.docs) {
             if (!element.exists) {
@@ -56,7 +43,6 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
               result.add(item);
             }
           }
-          //debugPrint("Successful query!");
         }).catchError((error) {
           debugPrint("Failed operation with error: $error.");
         });
@@ -106,45 +92,49 @@ class PostSerialize extends DBSerialize<Post> {
     return value;
   }
 
-  Future<List<Post>> getMyPosts() async {
-    Query current = FirebaseFirestore.instance.collection(getCollection());
+  Future<List<Post>> getMyPosts({required String query}) async {
+    Query postQuery = FirebaseFirestore.instance.collection(getCollection());
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    current = current.where("userid", isEqualTo: uid);
-    QuerySnapshot resultSnapshot;
-    List<Post> result = [];
-    await current.get().then(
-      (value) {
-        resultSnapshot = value;
-        for (var element in resultSnapshot.docs) {
-          if (!element.exists) {
-            continue;
-          }
-
-          Post? item = createFrom(element.data() as Map<String, dynamic>);
-          if (item != null) {
-            result.add(item);
-          }
-        }
-      },
-    ).catchError((error) {
-      debugPrint("Failed operation with error: $error.");
-    });
-    return result;
+    postQuery = postQuery.where("userid", isEqualTo: uid);
+    return searchDB(query, null, q: postQuery);
   }
 
-  Future<List<Post>> searchDB(String query, int pageLimit,
-      {required String orderBy,
-      required bool descending,
-      required List<Object?> startPoint}) async {
+  Future<List<Post>> getMyBookmarks({required String query}) async {
+    UserSerialize u = UserSerialize();
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentReference document =
+        FirebaseFirestore.instance.collection(u.getCollection()).doc(uid);
+    DocumentSnapshot<Object?> docSnapshot = await document.get();
+    List<int> bookmarkList = [0];
+    if (docSnapshot.exists) {
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+      bookmarkList.addAll(List<int>.from(data["bookmarks"]));
+    }
+    Query postQuery = FirebaseFirestore.instance.collection(getCollection());
+    postQuery = postQuery.where("postid", whereIn: bookmarkList);
+    return searchDB(query, null, q: postQuery);
+  }
+
+  Future<List<Post>> searchDB(
+    String query,
+    int? pageLimit, {
+    String? orderBy,
+    bool? descending,
+    List<Object?>? startPoint,
+    Query? q,
+  }) async {
     Set<Post> result = <Post>{};
     /////add book_name as a field
     for (String property in ["q_author", "q_title", "isbn", "q_book_name"]) {
-      List<Post> curList = await getEntries({property: query}, pageLimit,
-          orderBy: orderBy, descending: descending, startPoint: startPoint);
+      List<Post> curList = await getEntries(property, query, pageLimit,
+          orderBy: orderBy,
+          descending: descending,
+          startPoint: startPoint,
+          q: q);
       result.addAll(curList);
     }
     List<Post> resultList = result.toList();
-    if (result.length <= pageLimit) {
+    if (pageLimit == null || result.length <= pageLimit) {
       return resultList;
     } else {
       return resultList.sublist(0, pageLimit);
@@ -218,7 +208,8 @@ class UserSerialize extends DBSerialize<BindrUser> {
   @override
   BindrUser? createFrom(Map<String, dynamic> map) {
     List<String> allKeys = [
-      "date_created",
+      'bookmarks'
+          "date_created",
       "email",
       "hofid",
       "last_access",
@@ -232,6 +223,7 @@ class UserSerialize extends DBSerialize<BindrUser> {
     }
 
     return BindrUser(
+      bookmarks: List<int>.from(map["bookmarks"]),
       email: map["email"],
       hofID: map["hofid"],
       dateCreated: map["date_created"],

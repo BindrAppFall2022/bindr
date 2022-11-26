@@ -45,7 +45,7 @@ class BindrDrawer extends StatelessWidget {
               condition = currentPage == pages[index];
               return ListTile(
                 leading: Icon(
-                  Icons.co_present_rounded,
+                  icons[index],
                   color: condition ? Colors.black : pink,
                 ),
                 tileColor: condition ? pink : null,

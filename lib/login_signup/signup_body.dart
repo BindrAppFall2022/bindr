@@ -152,6 +152,7 @@ class SignUpBody extends StatelessWidget {
                   String userID = result.user.uid;
                   Timestamp currentTime = Timestamp.now();
                   BindrUser newUser = BindrUser(
+                    bookmarks: [],
                     dateCreated: currentTime,
                     email: emailString,
                     hofID: hofID,

@@ -9,6 +9,7 @@ import 'package:bindr_app/items/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'login_signup/login.dart';
+import 'my_bookmarks/my_bookmarks.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,10 +56,12 @@ class _MyAppState extends State<MyApp> {
                 '/welcome': (BuildContext context) => Welcome(),
                 '/welcome/login': (BuildContext context) => Login(),
                 '/welcome/signup': (BuildContext context) => SignUp(),
-                '/my_posts': (context) => const MyPosts(searchString: ''),
+                '/my_posts': (context) =>
+                    const MyPosts(searchString: '', hasPosts: null),
                 '/search': (BuildContext context) => SearchScreen(),
                 '/sell': (BuildContext context) => SellScreen(),
-                //'/bookmarks':(BuildContext context) => Bookmarks(searchString: ''),
+                '/bookmarks': (BuildContext context) =>
+                    const MyBookmarks(searchString: '', hasBookmarks: null),
                 //'/settings':(BuildContext context) => SettingsPage(),
               },
               debugShowCheckedModeBanner: false,
