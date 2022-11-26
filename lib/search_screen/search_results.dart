@@ -4,6 +4,7 @@ import 'package:bindr_app/items/rounded_button.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
+import 'package:intl/intl.dart';
 
 class SearchResults extends StatefulWidget {
   final String searchString;
@@ -48,6 +49,8 @@ class _SearchResultsState extends State<SearchResults> {
   ];
 
   bool descending = true;
+
+  final dateFormatter = DateFormat('yyyy-MM-dd');
 
   List<Object?> lastPost = [null];
   List<Post> postList = [];
@@ -391,6 +394,14 @@ class _SearchResultsState extends State<SearchResults> {
                                               width: 120,
                                             ),
                                           ),
+                                          Positioned(
+                                            top: 148,
+                                            left: 300,
+                                            child: Text(dateFormatter.format(
+                                                postList[index]
+                                                    .lastModified
+                                                    .toDate())),
+                                          ),
                                           ConstrainedBox(
                                             constraints: const BoxConstraints(
                                                 minHeight: 170),
@@ -476,14 +487,29 @@ class _SearchResultsState extends State<SearchResults> {
                                                           BorderRadius.all(
                                                               Radius.circular(
                                                                   10))),
-                                              trailing: Column(
-                                                children: [
-                                                  Text(postList[index].price,
-                                                      textScaleFactor: 1.3,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold))
-                                                ],
+                                              trailing: SizedBox(
+                                                width: size.width * 0.17,
+                                                child: Text(
+                                                    postList[index].price,
+                                                    textScaleFactor: () {
+                                                  if (postList[index]
+                                                          .price
+                                                          .length >
+                                                      8) {
+                                                    return 1.0;
+                                                  } else if (postList[index]
+                                                          .price
+                                                          .length >
+                                                      6) {
+                                                    return 1.2;
+                                                  } else {
+                                                    return 1.3;
+                                                  }
+                                                }(),
+                                                    textAlign: TextAlign.right,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)),
                                               ),
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),

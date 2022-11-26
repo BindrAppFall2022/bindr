@@ -34,7 +34,7 @@ class Validate {
 
   bool validatePrice(String? price) {
     if (price is String && price != "") {
-      RegExp priceRegex = RegExp("^([0-9]+(.[0-9]+)?)\$");
+      RegExp priceRegex = RegExp("^[0-9]{1,4}([.][0-9]+)?\$");
       if (priceRegex.hasMatch(price)) {
         return true;
       }
@@ -55,5 +55,5 @@ main() {
   // print(v.validateEmailField("7@gmail.com"));
   // print(v.validateHofID("h702896277"));
   //print(v.validateISBN("1234567890"));
-  print(v.validatePrice("1234567890.00"));
+  //print(v.validatePrice("12345"));
 }

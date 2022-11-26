@@ -173,7 +173,8 @@ class _SellScreenState extends State<SellScreen> {
                   debugPrint("Error: Please enter a valid ISBN-10 or ISBN-13");
                 }
                 if (!validator.validatePrice(price)) {
-                  debugPrint("Error: Please enter a price in USD format");
+                  debugPrint(
+                      "Error: Please enter a price in USD format less than \$9999.99");
                 }
                 if (!validator.validateTitle(post_title)) {
                   debugPrint("Error: Title must be at least 5 characters long");
