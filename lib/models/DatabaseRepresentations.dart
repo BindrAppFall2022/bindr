@@ -137,8 +137,10 @@ class BindrUser extends DBRepresentation<BindrUser> {
   String userID;
   String email;
   String hofID;
+  List<int> bookmarks;
 
   BindrUser({
+    required this.bookmarks,
     required this.email,
     required this.hofID,
     required this.userID,
@@ -169,8 +171,9 @@ class BindrUser extends DBRepresentation<BindrUser> {
   @override
   Map<String, Object?> toMap({onUpdate = false}) {
     var tomap = <String, Object?>{
+      "bookmarks": bookmarks,
       "date_created": dateCreated,
-      "email": email.toString(),
+      "email": email,
       "hofid": hofID,
       "last_access": lastAccessed,
     };

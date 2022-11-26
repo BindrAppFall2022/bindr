@@ -2,33 +2,34 @@ import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/custom_popup_menu_item.dart';
 import 'package:bindr_app/items/rounded_button.dart';
-import 'package:bindr_app/sell_screen/sell.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
 import 'package:intl/intl.dart';
 
-class MyPosts extends StatefulWidget {
+import '../search_screen/search_screen.dart';
+
+class MyBookmarks extends StatefulWidget {
   final String searchString;
   final double barWidth;
   final bool descending;
   final int currentFilterIndex;
-  final bool? hasPosts;
+  final bool? hasBookmarks;
 
-  const MyPosts({
+  const MyBookmarks({
     super.key,
     required this.searchString,
     this.barWidth = .75,
     this.descending = true,
     this.currentFilterIndex = 0,
-    required this.hasPosts,
+    required this.hasBookmarks,
   });
 
   @override
-  State<MyPosts> createState() => _MyPostsState();
+  State<MyBookmarks> createState() => _MyBookmarksState();
 }
 
-class _MyPostsState extends State<MyPosts> {
+class _MyBookmarksState extends State<MyBookmarks> {
   final TextEditingController _controllerSearchBar = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   bool _showBackToTopButton = false;
@@ -63,7 +64,7 @@ class _MyPostsState extends State<MyPosts> {
   List<Post> fullData = [];
   int curDataIndex = 0;
   @override
-  MyPosts get widget => super.widget;
+  MyBookmarks get widget => super.widget;
 
   bool loading = false, finishedLoading = false;
 
@@ -75,7 +76,7 @@ class _MyPostsState extends State<MyPosts> {
       loading = true;
     });
     List<Post> newList =
-        await PostSerialize().getMyPosts(query: widget.searchString);
+        await PostSerialize().getMyBookmarks(query: widget.searchString);
     if (newList.isNotEmpty) {
       fullData.addAll(newList);
       sortData(key: orderByKey, descending: descending);
@@ -89,7 +90,7 @@ class _MyPostsState extends State<MyPosts> {
       }
       hasPosts = true;
     } else {
-      hasPosts = (widget.hasPosts != true) ? false : true;
+      hasPosts = (widget.hasBookmarks != true) ? false : true;
     }
     setState(() {
       loading = false;
@@ -187,7 +188,7 @@ class _MyPostsState extends State<MyPosts> {
               elevation: 0,
             ),
             backgroundColor: Theme.of(context).primaryColor,
-            drawer: BindrDrawer(currentPage: "MY POSTS"),
+            drawer: BindrDrawer(currentPage: "BOOKMARKS"),
             floatingActionButton: _showBackToTopButton == false
                 ? null
                 : FloatingActionButton(
@@ -346,12 +347,12 @@ class _MyPostsState extends State<MyPosts> {
                                 FocusScope.of(context).unfocus();
                                 Navigator.of(context)
                                     .pushReplacement(MaterialPageRoute(
-                                        builder: (context) => MyPosts(
+                                        builder: (context) => MyBookmarks(
                                               searchString: currentSearchString,
                                               currentFilterIndex:
                                                   currentFilterIndex,
                                               descending: descending,
-                                              hasPosts: hasPosts,
+                                              hasBookmarks: hasPosts,
                                             )));
                               },
                               icon: const Icon(
@@ -366,11 +367,11 @@ class _MyPostsState extends State<MyPosts> {
                           FocusScope.of(context).unfocus();
                           Navigator.of(context)
                               .pushReplacement(MaterialPageRoute(
-                                  builder: (context) => MyPosts(
+                                  builder: (context) => MyBookmarks(
                                         searchString: currentSearchString,
                                         currentFilterIndex: currentFilterIndex,
                                         descending: descending,
-                                        hasPosts: hasPosts,
+                                        hasBookmarks: hasPosts,
                                       )));
                         },
                         onChanged: (String text) {
@@ -571,18 +572,18 @@ class _MyPostsState extends State<MyPosts> {
                                       padding:
                                           EdgeInsets.only(left: 8.0, top: 40),
                                       child: Text(
-                                        "You currently have no posts listed. Click the button below to make a post:",
+                                        "You currently have no bookmarks listed. Click the button below to search for posts:",
                                         textScaleFactor: 2,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(color: pink),
                                       )),
                                   RoundButton(
-                                    text: "Create a Post",
+                                    text: "Search for Posts",
                                     press: () {
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  SellScreen()));
+                                                  SearchScreen()));
                                     },
                                   )
                                 ]
