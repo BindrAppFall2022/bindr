@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class RoundButton extends StatelessWidget {
   final String text;
   final Function()? press;
+  final Color backgroundcolor;
   const RoundButton({
     Key? key,
     required this.text,
     this.press,
+    this.backgroundcolor = pink,
   }) : super(key: key);
 
   @override
@@ -20,7 +22,7 @@ class RoundButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(25),
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: pink,
+              backgroundColor: backgroundcolor,
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             ),
             onPressed: press,
