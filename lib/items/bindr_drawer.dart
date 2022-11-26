@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/constants.dart';
-import '../sell_screen/sell.dart';
 import '../welcome_screen/welcome.dart';
 import '../services/auth.dart';
 
+const pages = ["MY POSTS", "BOOKMARKS", "SEARCH", "SELL BOOK", "SETTINGS"];
+const icons = [
+  Icons.co_present_rounded,
+  Icons.bookmark_border_rounded,
+  Icons.search_rounded,
+  Icons.book_outlined,
+  Icons.settings_rounded,
+];
+const routes = ['/my_posts', '/bookmarks', '/search', '/sell', '/settings'];
+
 class BindrDrawer extends StatelessWidget {
-  BindrDrawer({super.key});
+  final String currentPage;
+  BindrDrawer({required this.currentPage, super.key});
   final auth = AuthService();
+
+  bool condition = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,59 +38,29 @@ class BindrDrawer extends StatelessWidget {
                 image:
                     Image.asset("assets/bindr_images/Bindr_logo_.png").image),
           ),
-          ListTile(
-            leading: const Icon(
-              Icons.co_present_rounded,
-              color: pink,
-            ),
-            title: const Text("PROFILE",
-                style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {
-              //Navigator.of(context).popAndPushNamed('/profile');
-            }, // waiting for profile page
-          ),
-          ListTile(
-            leading: const Icon(Icons.bookmark_border_rounded, color: pink),
-            title: const Text("BOOKMARKS",
-                style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {
-              //Navigator.of(context).popAndPushNamed('/bookmarks');
-            }, // waiting for bookmarks page
-          ),
-          ListTile(
-            leading: const Icon(Icons.search_rounded, color: pink),
-            title: const Text("SEARCH",
-                style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {
-              Navigator.of(context).popAndPushNamed('/search');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.book_outlined, color: pink),
-            title: const Text("SELL BOOK",
-                style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {
-              Navigator.of(context).popAndPushNamed('/sell');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.article_outlined, color: pink),
-            title: const Text("SETTINGS",
-                style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () {
-              //Navigator.of(context).popAndPushNamed('/settings');
-            }, // waiting for settings page
-          ),
-          ListTile(
-            leading: const Icon(Icons.exit_to_app_rounded, color: pink),
-            title: const Text("SIGN OUT",
-                style: TextStyle(color: pink, fontSize: 20)),
-            onTap: () async {
-              await auth.signOut();
-              // ignore: use_build_context_synchronously
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => Welcome()),
-                  (route) => false);
+          ListView.builder(
+            itemCount: pages.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              condition = currentPage == pages[index];
+              return ListTile(
+                leading: Icon(
+                  Icons.co_present_rounded,
+                  color: condition ? Colors.black : pink,
+                ),
+                tileColor: condition ? pink : null,
+                title: Text(pages[index],
+                    style: TextStyle(
+                        color: condition ? Colors.black : pink, fontSize: 20)),
+                onTap: condition
+                    ? () {}
+                    : () {
+                        Navigator.of(context)
+                          ..pop()
+                          ..pop()
+                          ..pushNamed(routes[index]);
+                      },
+              );
             },
           )
         ],

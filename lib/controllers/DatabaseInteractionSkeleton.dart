@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../models/DatabaseRepresentations.dart';
@@ -103,6 +104,32 @@ class PostSerialize extends DBSerialize<Post> {
       return 0;
     });
     return value;
+  }
+
+  Future<List<Post>> getMyPosts() async {
+    Query current = FirebaseFirestore.instance.collection(getCollection());
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    current = current.where("userid", isEqualTo: uid);
+    QuerySnapshot resultSnapshot;
+    List<Post> result = [];
+    await current.get().then(
+      (value) {
+        resultSnapshot = value;
+        for (var element in resultSnapshot.docs) {
+          if (!element.exists) {
+            continue;
+          }
+
+          Post? item = createFrom(element.data() as Map<String, dynamic>);
+          if (item != null) {
+            result.add(item);
+          }
+        }
+      },
+    ).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+    });
+    return result;
   }
 
   Future<List<Post>> searchDB(String query, int pageLimit,

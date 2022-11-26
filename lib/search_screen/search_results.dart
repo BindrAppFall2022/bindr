@@ -1,6 +1,5 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/custom_popup_menu_item.dart';
-import 'package:bindr_app/items/rounded_button.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
@@ -27,6 +26,7 @@ class SearchResults extends StatefulWidget {
 class _SearchResultsState extends State<SearchResults> {
   final TextEditingController _controllerSearchBar = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _showBackToTopButton = false;
 
   late String currentSearchString;
 
@@ -82,9 +82,6 @@ class _SearchResultsState extends State<SearchResults> {
         postList.addAll(fullData);
         curDataIndex += fullData.length;
       }
-      // lastPost = [
-      //   {orderByKey: postList[postList.length - 1].toMap()[orderByKey]}
-      // ];
     }
     setState(() {
       loading = false;
@@ -143,13 +140,23 @@ class _SearchResultsState extends State<SearchResults> {
         fetchData();
       }
     });
+    _scrollController.addListener(() {
+      setState(() {
+        _showBackToTopButton = (_scrollController.offset >= 200) ? true : false;
+      });
+    });
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(0,
+        duration: const Duration(milliseconds: 800), curve: Curves.linear);
   }
 
   @override
   void dispose() {
     super.dispose();
     _controllerSearchBar.dispose();
-    //_scrollController.dispose();
+    _scrollController.dispose();
   }
 
   sortData({required String key, required bool descending}) {
@@ -172,6 +179,13 @@ class _SearchResultsState extends State<SearchResults> {
               elevation: 0,
             ),
             backgroundColor: Theme.of(context).primaryColor,
+            floatingActionButton: _showBackToTopButton == false
+                ? null
+                : FloatingActionButton(
+                    onPressed: _scrollToTop,
+                    backgroundColor: pink,
+                    child: const Icon(Icons.arrow_upward),
+                  ),
             body: SingleChildScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
@@ -305,7 +319,7 @@ class _SearchResultsState extends State<SearchResults> {
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: InputBorder.none,
-                          hintText: "Enter Book Title, Author, or ISBN",
+                          hintText: "Enter Title, Author, or ISBN",
                           floatingLabelAlignment: FloatingLabelAlignment.center,
                           suffixIconConstraints: BoxConstraints(
                               maxHeight: size.height * 0.2,
@@ -522,30 +536,14 @@ class _SearchResultsState extends State<SearchResults> {
                                     ),
                                   );
                                 } else {
-                                  return SizedBox(
-                                    width: constraints.maxWidth,
-                                    height: 150,
-                                    child: Center(
-                                        child: Column(
-                                      children: [
-                                        const Text(
-                                          "End of Results",
-                                          style: TextStyle(
-                                              fontSize: 35,
-                                              fontWeight: FontWeight.bold,
-                                              color: pink),
-                                        ),
-                                        RoundButton(
-                                            text: "Go Back to Top",
-                                            press: () {
-                                              _scrollController.animateTo(0,
-                                                  duration: const Duration(
-                                                      milliseconds: 400),
-                                                  curve: Curves.linear);
-                                            })
-                                      ],
-                                    )),
-                                  );
+                                  return const Center(
+                                      child: Text(
+                                    "End of Results",
+                                    style: TextStyle(
+                                        fontSize: 35,
+                                        fontWeight: FontWeight.bold,
+                                        color: pink),
+                                  ));
                                 }
                               }),
                               separatorBuilder: (context, index) =>
