@@ -25,6 +25,7 @@ class SearchScreen extends StatelessWidget {
         backgroundColor: logobackground,
         elevation: 0,
       ),
+      drawer: BindrDrawer(currentPage: "SEARCH"),
       backgroundColor: Theme.of(context).primaryColor,
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -110,7 +111,6 @@ class SearchScreen extends StatelessWidget {
           ],
         ),
       ),
-      drawer: BindrDrawer(),
     ));
   }
 

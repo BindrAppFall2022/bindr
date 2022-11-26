@@ -1,4 +1,5 @@
 import 'package:bindr_app/login_signup/signup.dart';
+import 'package:bindr_app/my_posts/my_posts.dart';
 import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:bindr_app/sell_screen/sell.dart';
 import 'package:flutter/material.dart';
@@ -54,8 +55,11 @@ class _MyAppState extends State<MyApp> {
                 '/welcome': (BuildContext context) => Welcome(),
                 '/welcome/login': (BuildContext context) => Login(),
                 '/welcome/signup': (BuildContext context) => SignUp(),
+                '/my_posts': (context) => const MyPosts(searchString: ''),
                 '/search': (BuildContext context) => SearchScreen(),
                 '/sell': (BuildContext context) => SellScreen(),
+                //'/bookmarks':(BuildContext context) => Bookmarks(searchString: ''),
+                //'/settings':(BuildContext context) => SettingsPage(),
               },
               debugShowCheckedModeBanner: false,
               title: 'Bindr',

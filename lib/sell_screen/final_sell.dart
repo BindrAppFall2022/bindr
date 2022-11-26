@@ -60,118 +60,120 @@ class Confirm extends StatelessWidget {
     } else {
       isbnListStr = isbnStr = "None found";
     }
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          "CONFIRM LISTING",
-          style: TextStyle(color: pink, fontSize: 25),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          title: const Text(
+            "CONFIRM LISTING",
+            style: TextStyle(color: pink, fontSize: 25),
+          ),
+          backgroundColor: logobackground,
         ),
         backgroundColor: logobackground,
-      ),
-      backgroundColor: logobackground,
-      body: Center(
-        heightFactor: 1.1,
-        child: SingleChildScrollView(
-            child: Column(
-          children: <Widget>[
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  postTitle,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: pink, fontSize: 40),
-                )),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              color: Colors.black,
-              child: Image.network(
-                "$pic",
-                height: 350,
-                width: 500,
-                fit: BoxFit.contain,
+        body: Center(
+          heightFactor: 1.1,
+          child: SingleChildScrollView(
+              child: Column(
+            children: <Widget>[
+              Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    postTitle,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: pink, fontSize: 40),
+                  )),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                color: Colors.black,
+                child: Image.network(
+                  "$pic",
+                  height: 350,
+                  width: 500,
+                  fit: BoxFit.contain,
+                ),
               ),
-            ),
-            Container(
-                alignment: Alignment.topCenter,
+              Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    "Condition: $cond",
+                    style: const TextStyle(
+                        color: pink, fontSize: 25, fontWeight: FontWeight.bold),
+                  )),
+              Center(
                 child: Text(
-                  "Condition: $cond",
-                  style: const TextStyle(
-                      color: pink, fontSize: 25, fontWeight: FontWeight.bold),
-                )),
-            Center(
-              child: Text(
-                textAlign: TextAlign.center,
-                "Textbook: $bookName",
-                style: const TextStyle(
-                    color: pink, fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  "Author: $authorStr", //i
-                  style: const TextStyle(
-                      color: pink, fontSize: 25, fontWeight: FontWeight.bold),
-                )),
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  "ISBN: $isbnStr",
-                  style: const TextStyle(
-                      color: pink, fontSize: 20, fontWeight: FontWeight.bold),
-                )),
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  "Description: $description",
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: pink, fontSize: 20),
-                )),
-            Container(
-                alignment: Alignment.topCenter,
-                child: Text(
-                  "Listing Price: $price",
+                  "Textbook: $bookName",
                   style: const TextStyle(
-                      color: pink, fontSize: 25, fontWeight: FontWeight.bold),
-                )),
-            RoundButton(
-              text: "Confirm Listing",
-              press: () async {
-                int postID = await PostSerialize().newPostID();
-                Post entry = Post(
-                  author: authorStr,
-                  bookName: bookName as String,
-                  condition: con(cond),
-                  dateCreated: Timestamp.fromDate(DateTime.now()),
-                  description: description as String,
-                  imageURL: "$pic",
-                  isbn: isbnStr,
-                  lastModified: Timestamp.fromDate(DateTime.now()),
-                  numBookmarks: 0,
-                  price: price,
-                  postID: postID,
-                  qAuthor: authorStr.toLowerCase(),
-                  qBookName: (bookName as String).toLowerCase(),
-                  qTitle: postTitle.toLowerCase(),
-                  title: postTitle,
-                  userID: FirebaseAuth.instance.currentUser!.uid,
-                );
-                entry.createEntry().then((value) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const ConfirmScreen()));
-                });
+                      color: pink, fontSize: 30, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    "Author: $authorStr", //i
+                    style: const TextStyle(
+                        color: pink, fontSize: 25, fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    "ISBN: $isbnStr",
+                    style: const TextStyle(
+                        color: pink, fontSize: 20, fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    "Description: $description",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: pink, fontSize: 20),
+                  )),
+              Container(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    "Listing Price: $price",
+                    style: const TextStyle(
+                        color: pink, fontSize: 25, fontWeight: FontWeight.bold),
+                  )),
+              RoundButton(
+                text: "Confirm Listing",
+                press: () async {
+                  int postID = await PostSerialize().newPostID();
+                  Post entry = Post(
+                    author: authorStr,
+                    bookName: bookName as String,
+                    condition: con(cond),
+                    dateCreated: Timestamp.fromDate(DateTime.now()),
+                    description: description as String,
+                    imageURL: "$pic",
+                    isbn: isbnStr,
+                    lastModified: Timestamp.fromDate(DateTime.now()),
+                    numBookmarks: 0,
+                    price: price,
+                    postID: postID,
+                    qAuthor: authorStr.toLowerCase(),
+                    qBookName: (bookName as String).toLowerCase(),
+                    qTitle: postTitle.toLowerCase(),
+                    title: postTitle,
+                    userID: FirebaseAuth.instance.currentUser!.uid,
+                  );
+                  entry.createEntry().then((value) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const ConfirmScreen()));
+                  });
 
-                //.then((value) {
-                //   Navigator.of(context)
-                //     ..pop()
-                //     ..pop()
-                //     ..push(); //push the screen view
-                // });
-              },
-            ),
-          ],
-        )),
+                  //.then((value) {
+                  //   Navigator.of(context)
+                  //     ..pop()
+                  //     ..pop()
+                  //     ..push(); //push the screen view
+                  // });
+                },
+              ),
+            ],
+          )),
+        ),
       ),
     );
   }
