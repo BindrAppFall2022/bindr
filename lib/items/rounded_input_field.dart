@@ -9,6 +9,7 @@ class rounded_input_field extends StatelessWidget {
   final int? maxLength;
   final void Function(String)? onSubmitted;
   final TextEditingController? controller;
+  final String? errorText;
 
   const rounded_input_field({
     Key? key,
@@ -19,6 +20,7 @@ class rounded_input_field extends StatelessWidget {
     this.maxLength,
     this.onSubmitted,
     this.controller,
+    this.errorText,
   }) : super(key: key);
 
   @override
@@ -36,6 +38,9 @@ class rounded_input_field extends StatelessWidget {
           icon,
           color: logobackground,
         ),
+        errorText: errorText,
+        errorMaxLines: 2,
+        errorStyle: TextStyle(height: 0.9),
         hintText: hintText,
         border: InputBorder.none,
       ),

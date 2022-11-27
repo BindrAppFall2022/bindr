@@ -1,3 +1,4 @@
+import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Validate {
@@ -7,14 +8,23 @@ class Validate {
     return emailRegex.hasMatch(email);
   }
 
-  Future<bool> validateHofID(String hofID) async {
-    RegExp emailRegex = RegExp("^(h|H)70[0-9]{7}\$");
-    var snapshot = FirebaseFirestore.instance
-        .collection("users")
+  Future<List> validateHofID(String hofID) async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection(UserSerialize().getCollection())
         .where('hofid', isEqualTo: hofID)
         .get();
-    //check if
-    return emailRegex.hasMatch(hofID);
+    if (snapshot.docs.isNotEmpty) {
+      return [false, "Error: An account with this Hofstra ID already exists"];
+    } else {
+      RegExp emailRegex = RegExp("^(h|H)70[0-9]{7}\$");
+      bool result = emailRegex.hasMatch(hofID);
+      return [
+        result,
+        result
+            ? null
+            : "Error: Invalid Hofstra ID, please use the format of h70XXXXXXX"
+      ];
+    }
   }
 
   //firebase will actually do this
@@ -43,7 +53,7 @@ class Validate {
   }
 
   bool validateTitle(String? title) {
-    if (title is String && title.length >= 5) {
+    if (title is String && title.length >= 3) {
       return true;
     }
     return false;

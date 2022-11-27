@@ -21,6 +21,8 @@ class _LoginBodyState extends State<LoginBody> {
   final TextEditingController _textEditingControllerU = TextEditingController();
   final TextEditingController _textEditingControllerP = TextEditingController();
 
+  String? errorTextU, errorTextP;
+
   String usernameString = "";
 
   String emailString = "";
@@ -43,7 +45,7 @@ class _LoginBodyState extends State<LoginBody> {
       emailString = await UserSerialize().getEmailFromHofID(usernameString) ??
           usernameString;
       if (emailString == "") {
-        /////username not found
+        errorTextU = "Error: Username field is required";
       }
     } else {
       emailString = usernameString;
@@ -76,9 +78,13 @@ class _LoginBodyState extends State<LoginBody> {
         passwordString = passwordString;
       }
     } else {
-      print(error);
-
-      /////
+      setState(() {
+        if (error == 'invalid-email' || error == 'user-not-found') {
+          errorTextU = 'Error: Username/Email not found';
+        } else {
+          errorTextP = 'Error: Password is incorrect.';
+        }
+      });
     }
     setState(() {
       isLoading = false;
@@ -100,64 +106,76 @@ class _LoginBodyState extends State<LoginBody> {
 
     return isLoading
         ? const Center(child: CircularProgressIndicator())
-        : Background(
-            child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text("", // we can change this to whatever
-                    style: TextStyle(fontWeight: FontWeight.bold, color: pink)),
-                Image.asset(
-                  "assets/bindr_images/Bindr_logo_.png",
-                  height: size.height * 0.3,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerU,
-                  hide: false,
-                  hintText: "Enter Email/Hofstra ID",
-                  onChanged: (value) {
-                    usernameString = value.toLowerCase();
-                  },
-                  onSubmitted: (p) => login(context),
-                  icon: Icons.account_circle_sharp,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerP,
-                  hide: true,
-                  hintText: "Enter Password",
-                  onChanged: (value) {
-                    passwordString = value;
-                  },
-                  onSubmitted: (p) => login(context),
-                  icon: Icons.lock_sharp,
-                ),
-                RoundButton(text: "LOGIN", press: () => login(context)),
-                Row(
+        : Scaffold(
+            appBar: AppBar(elevation: 0, backgroundColor: logobackground),
+            body: Padding(
+              padding: EdgeInsets.only(top: size.height * 0.1),
+              child: SingleChildScrollView(
+                physics: const ScrollPhysics(),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
-                      "Don't Have an Account Yet? ",
-                      style: TextStyle(color: gray),
+                    Image.asset(
+                      "assets/bindr_images/Bindr_logo_.png",
+                      height: size.height * 0.3,
                     ),
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) => SignUp(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "SIGN UP",
-                          style: TextStyle(
-                            color: gray,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ))
+                    rounded_input_field(
+                      controller: _textEditingControllerU,
+                      errorText: errorTextU,
+                      hide: false,
+                      hintText: "Enter Email/Hofstra ID",
+                      onChanged: (value) {
+                        usernameString = value.toLowerCase();
+                        setState(() {
+                          errorTextU = null;
+                        });
+                      },
+                      onSubmitted: (p) => login(context),
+                      icon: Icons.account_circle_sharp,
+                    ),
+                    rounded_input_field(
+                      controller: _textEditingControllerP,
+                      errorText: errorTextP,
+                      hide: true,
+                      hintText: "Enter Password",
+                      onChanged: (value) {
+                        passwordString = value;
+                        setState(() {
+                          errorTextP = null;
+                        });
+                      },
+                      onSubmitted: (p) => login(context),
+                      icon: Icons.lock_sharp,
+                    ),
+                    RoundButton(text: "LOGIN", press: () => login(context)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "Don't Have an Account Yet? ",
+                          style: TextStyle(color: gray),
+                        ),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => SignUp(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "SIGN UP",
+                              style: TextStyle(
+                                color: gray,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ))
+                      ],
+                    )
                   ],
-                )
-              ],
+                ),
+              ),
             ),
-          ));
+          );
   }
 }

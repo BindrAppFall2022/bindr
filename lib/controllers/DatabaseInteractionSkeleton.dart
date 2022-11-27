@@ -210,7 +210,7 @@ class UserSerialize extends DBSerialize<BindrUser> {
 
     query = query.where("hofid", isEqualTo: hofID);
 
-    String email = "";
+    String? email;
 
     await query.get().then((snapshot) {
       for (var element in snapshot.docs) {
