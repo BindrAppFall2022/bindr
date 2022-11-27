@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/login_signup/login.dart';
 import 'package:bindr_app/login_signup/verify_popup.dart';
@@ -12,7 +15,6 @@ import 'package:bindr_app/items/rounded_input_field.dart';
 
 import '../items/hero_dialogue_route.dart';
 
-// will be making the dy here so that we can be consistent throughout the app
 class SignUpBody extends StatefulWidget {
   @override
   State<SignUpBody> createState() => _SignUpBodyState();
@@ -26,6 +28,8 @@ class _SignUpBodyState extends State<SignUpBody> {
   final TextEditingController _textEditingControllerP = TextEditingController();
   final TextEditingController _textEditingControllerPM =
       TextEditingController();
+
+  String? errorTextU, errorTextP, errorTextPM, errorTextE, errorTextEM;
 
   bool isLoading = false;
 
@@ -73,25 +77,24 @@ class _SignUpBodyState extends State<SignUpBody> {
     if (confirmEmailString == emailString) {
       emailsMatch = true;
     } else {
-      //Outline confirm email box in red color,
-      //Red Text "Email must match the email you entered"
       emailsMatch = false;
     }
-    hofIDValidated = await val.validateHofID(hofID);
+    var resultList = await val.validateHofID(hofID);
+    hofIDValidated = resultList[0];
+    errorTextU = resultList[1];
     //add some else cases for each of these
     if (hofIDValidated &&
         emailValidated &&
         passwordValidated &&
         emailsMatch &&
         passwordsMatch) {
-      /////check if username already exists.
       //////Firebase will check if email exists.
       var result = await auth.registerUser(emailString, passwordString, hofID);
       if (result is String) {
         if (result == 'weak-password') {
-          print('The password provided is too weak.');
+          errorTextP = 'Error: The password provided is too weak';
         } else if (result == 'email-already-in-use') {
-          print('The account already exists for that email.');
+          errorTextE = 'Error: The account already exists for that email';
         }
       } else {
         Navigator.of(context).push(HeroDialogueRoute(
@@ -128,21 +131,16 @@ class _SignUpBodyState extends State<SignUpBody> {
         await auth.signOut();
       }
     } else {
-      //check cases here
-      if (!hofIDValidated) {
-        print("ERROR: Hof ID is not valid");
-      }
+      //check the rest of the cases here
       if (!emailValidated) {
-        print("ERROR: Email is not valid");
-      }
-      if (!passwordValidated) {
-        print("ERROR: Password is not valid");
+        errorTextE =
+            "Error: Email is not valid, please enter a valid Hofstra email";
       }
       if (!emailsMatch) {
-        print("ERROR: Emails don't match");
+        errorTextEM = "Error: Email must match the email you entered";
       }
       if (!passwordsMatch) {
-        print("ERROR: Passwords do not match");
+        errorTextPM = "Error: Password must match the password you entered";
       }
     }
     setState(() {
@@ -152,6 +150,11 @@ class _SignUpBodyState extends State<SignUpBody> {
       _textEditingControllerP.text = passwordString;
       _textEditingControllerPM.text = confirmPasswordString;
       _textEditingControllerU.text = hofID;
+      errorTextU = errorTextU;
+      errorTextP = errorTextP;
+      errorTextPM = errorTextPM;
+      errorTextE = errorTextE;
+      errorTextEM = errorTextEM;
     });
   }
 
@@ -160,121 +163,138 @@ class _SignUpBodyState extends State<SignUpBody> {
     Size size = MediaQuery.of(context).size;
     return isLoading
         ? const Center(child: CircularProgressIndicator())
-        : Background(
-            child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Text("", // we can change this to whatever
-                    style: TextStyle(fontWeight: FontWeight.bold, color: pink)),
-                Image.asset(
-                  "assets/bindr_images/Bindr_logo_.png",
-                  height: size.height * 0.3,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerU,
-                  hide: false,
-                  hintText: "Enter Hofstra ID",
-                  onChanged: (value) async {
-                    hofID = value;
-                    //If ERROR Outline hofID box in red
-                    //Red Text "Please enter a valid Hofstra ID"
-                  },
-                  onSubmitted: (f) => register(context),
-                  icon: Icons.account_circle_sharp,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerP,
-                  hide: true,
-                  hintText: "Create Password",
-                  onChanged: (value) {
-                    passwordString = value;
-                    if (val.validatePassword(passwordString)) {
-                      passwordValidated = true;
-                    } else {
-                      //Outline Password Field in red and
-                      //Red Text Saying : :::::::::::;;;;
-                      passwordValidated = false;
-                    }
-                  },
-                  onSubmitted: (f) => register(context),
-                  icon: Icons.lock_sharp,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerPM,
-                  hide: true,
-                  hintText: "Confirm Password",
-                  onChanged: (value) {
-                    confirmPasswordString = value;
-                    if (confirmPasswordString == passwordString) {
-                      passwordsMatch = true;
-                    } else {
-                      //Outline confirm password box in red color,
-                      //Red Text "Password must match the password you entered"
-                      passwordsMatch = false;
-                    }
-                  },
-                  onSubmitted: (f) => register(context),
-                  icon: Icons.lock_sharp,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerE,
-                  hide: false,
-                  hintText: "Enter Hofstra Email",
-                  onChanged: (value) {
-                    emailString = value.toLowerCase();
-                    if (!val.validateEmailField(emailString)) {
-                      //Outline email box in red color,
-                      //Red Text "Please enter a valid Hofstra email"
-                      emailValidated = false;
-                    } else {
-                      emailValidated = true;
-                    }
-                  },
-                  onSubmitted: (f) => register(context),
-                  icon: Icons.account_circle_sharp,
-                ),
-                rounded_input_field(
-                  controller: _textEditingControllerEM,
-                  hide: false,
-                  hintText: "Confirm Hofstra Email",
-                  onChanged: (value) {
-                    confirmEmailString = value;
-                  },
-                  onSubmitted: (f) => register(context),
-                  icon: Icons.account_circle_sharp,
-                ),
-                RoundButton(
-                  text: "SIGN UP",
-                  press: () => register(context),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      "Have an Account Already? ",
-                      style: TextStyle(color: gray),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => Login(),
+        : Scaffold(
+            appBar: AppBar(elevation: 0, backgroundColor: logobackground),
+            body: SingleChildScrollView(
+              physics: const ScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text("", // we can change this to whatever
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, color: pink)),
+                  Image.asset(
+                    "assets/bindr_images/Bindr_logo_.png",
+                    height: size.height * 0.28,
+                  ),
+                  rounded_input_field(
+                    controller: _textEditingControllerU,
+                    errorText: errorTextU,
+                    hide: false,
+                    hintText: "Enter Hofstra ID",
+                    onChanged: (value) async {
+                      hofID = value;
+                      setState(() {
+                        errorTextU = null;
+                      });
+                    },
+                    onSubmitted: (f) => register(context),
+                    icon: Icons.account_circle_sharp,
+                  ),
+                  rounded_input_field(
+                    controller: _textEditingControllerP,
+                    errorText: errorTextP,
+                    hide: true,
+                    hintText: "Create Password",
+                    onChanged: (value) {
+                      setState(() {
+                        errorTextP = null;
+                      });
+                      passwordString = value;
+                      passwordValidated = val.validatePassword(passwordString);
+                    },
+                    onSubmitted: (f) => register(context),
+                    icon: Icons.lock_sharp,
+                  ),
+                  rounded_input_field(
+                    controller: _textEditingControllerPM,
+                    errorText: errorTextPM,
+                    hide: true,
+                    hintText: "Confirm Password",
+                    onChanged: (value) {
+                      setState(() {
+                        errorTextPM = null;
+                      });
+                      confirmPasswordString = value;
+                      if (confirmPasswordString == passwordString) {
+                        passwordsMatch = true;
+                      } else {
+                        //Outline confirm password box in red color,
+                        //Red Text "Password must match the password you entered"
+                        passwordsMatch = false;
+                      }
+                    },
+                    onSubmitted: (f) => register(context),
+                    icon: Icons.lock_sharp,
+                  ),
+                  rounded_input_field(
+                    controller: _textEditingControllerE,
+                    errorText: errorTextE,
+                    hide: false,
+                    hintText: "Enter Hofstra Email",
+                    onChanged: (value) {
+                      setState(() {
+                        errorTextE = null;
+                      });
+                      emailString = value.toLowerCase();
+                      if (!val.validateEmailField(emailString)) {
+                        emailValidated = false;
+                      } else {
+                        emailValidated = true;
+                      }
+                    },
+                    onSubmitted: (f) => register(context),
+                    icon: Icons.account_circle_sharp,
+                  ),
+                  rounded_input_field(
+                    controller: _textEditingControllerEM,
+                    errorText: errorTextEM,
+                    hide: false,
+                    hintText: "Confirm Hofstra Email",
+                    onChanged: (value) {
+                      setState(() {
+                        errorTextEM = null;
+                      });
+                      confirmEmailString = value;
+                    },
+                    onSubmitted: (f) => register(context),
+                    icon: Icons.account_circle_sharp,
+                  ),
+                  RoundButton(
+                    text: "SIGN UP",
+                    press: () => register(context),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const Text(
+                        "Have an Account Already? ",
+                        style: TextStyle(color: gray),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => Login(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "LOG IN",
+                          style: TextStyle(
+                            color: gray,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
-                      child: const Text(
-                        "LOG IN",
-                        style: TextStyle(
-                          color: gray,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    )
-                  ],
-                )
-              ],
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(50),
+                  )
+                ],
+              ),
             ),
-          ));
+          );
   }
 }

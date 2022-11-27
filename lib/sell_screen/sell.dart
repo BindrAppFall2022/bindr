@@ -14,7 +14,16 @@ class SellScreen extends StatefulWidget {
 }
 
 class _SellScreenState extends State<SellScreen> {
-  String? post_title;
+  final TextEditingController _textEditingControllerPT =
+      TextEditingController();
+  final TextEditingController _textEditingControllerI = TextEditingController();
+  final TextEditingController _textEditingControllerC = TextEditingController();
+  final TextEditingController _textEditingControllerPR =
+      TextEditingController();
+
+  String? errorTextPT, errorTextI, errorTextC, errorTextPR;
+
+  String? postTitle;
 
   String? isbn;
 
@@ -32,6 +41,74 @@ class _SellScreenState extends State<SellScreen> {
         _dropdownValue = selectedValue;
       });
     }
+  }
+
+  listBook(BuildContext context) async {
+    if (validator.validateISBN(isbn) &&
+        validator.validatePrice(price) &&
+        validator.validateTitle(postTitle) &&
+        _dropdownValue is String) {
+      if (description is! String) {
+        description = "";
+      }
+      Map<String, Object?>? info = await getInfo(isbn!);
+      if (info == null) {
+        errorTextI =
+            "Error: ISBN not found, please make sure you typed it in correctly.";
+      } else {
+        String finalPrice = formatPrice(price!);
+        if (info["Image"] == null) {
+          info["Image"] =
+              "http://www.nipponniche.com/wp-content/uploads/2021/04/fentres-pdf.jpeg";
+        }
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => Confirm(
+                    postTitle: postTitle!,
+                    isbn: info["ISBN"],
+                    bookName: info["Name"],
+                    author: info["Author"],
+                    cond: _dropdownValue!,
+                    description: description,
+                    price: finalPrice,
+                    pic: info["Image"],
+                  )),
+        );
+      }
+    } else {
+      if (!validator.validateISBN(isbn)) {
+        errorTextI = "Error: Please enter a valid ISBN-10 or ISBN-13";
+      }
+      if (!validator.validatePrice(price)) {
+        errorTextPR =
+            "Error: Please enter a price in USD format less than \$9999.99";
+      }
+      if (!validator.validateTitle(postTitle)) {
+        errorTextPT = "Error: Title must be at least 3 characters long";
+      }
+      if (_dropdownValue is! String) {
+        errorTextC = "Error: Please select a condition value";
+      }
+    }
+    setState(() {
+      _textEditingControllerC.text = _dropdownValue ?? "";
+      _textEditingControllerI.text = isbn ?? "";
+      _textEditingControllerPR.text = price ?? "";
+      _textEditingControllerPT.text = postTitle ?? "";
+      errorTextC = errorTextC;
+      errorTextI = errorTextI;
+      errorTextPR = errorTextPR;
+      errorTextPT = errorTextPT;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _textEditingControllerC.dispose();
+    _textEditingControllerPR.dispose();
+    _textEditingControllerPT.dispose();
+    _textEditingControllerI.dispose();
   }
 
   @override
@@ -55,87 +132,122 @@ class _SellScreenState extends State<SellScreen> {
                   style: TextStyle(color: pink, fontSize: 35),
                 )),
             rounded_input_field(
-              // enter post title
+              controller: _textEditingControllerPT,
+              errorText: errorTextPT,
               maxLength: 50,
               hide: false,
               hintText: "ENTER TITLE OF LISTING",
               icon: Icons.title_sharp,
               onChanged: (value) {
-                post_title = value;
+                setState(() {
+                  errorTextPT = null;
+                });
+                postTitle = value;
               },
+              onSubmitted: (p0) => listBook(context),
             ),
             rounded_input_field(
+              controller: _textEditingControllerI,
+              errorText: errorTextI,
               maxLength: 13,
               hide: false,
               hintText: "ENTER ISBN",
               icon: Icons.book_sharp,
               onChanged: (value) {
+                setState(() {
+                  errorTextI = null;
+                });
                 isbn = value;
               },
+              onSubmitted: (p0) => listBook(context),
             ),
             Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 width: size.width * 0.8,
                 decoration: BoxDecoration(
                   color: gray,
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: Theme(
-                    data: Theme.of(context).copyWith(
-                      canvasColor: gray,
-                    ),
-                    child: DropdownButton<String>(
-                      value: _dropdownValue,
-                      isExpanded: true,
-                      hint: const Text("SELECT CONDITION",
-                          style: TextStyle(color: logobackground)),
-                      items: const [
-                        DropdownMenuItem(
-                          value: "NEW",
-                          child: Text("NEW",
-                              style: TextStyle(color: logobackground)),
-                        ),
-                        DropdownMenuItem(
-                          value: "GREAT",
-                          child: Text("GREAT",
-                              style: TextStyle(color: logobackground)),
-                        ),
-                        DropdownMenuItem(
-                          value: "GOOD",
-                          child: Text("GOOD",
-                              style: TextStyle(color: logobackground)),
-                        ),
-                        DropdownMenuItem(
-                          value: "BAD",
-                          child: Text("BAD",
-                              style: TextStyle(color: logobackground)),
-                        ),
-                        DropdownMenuItem(
-                          value: "POOR",
-                          child: Text("POOR",
-                              style: TextStyle(color: logobackground)),
-                        ),
-                      ],
-                      onChanged: dropdownCallback,
-                    ))), //drop down button for condition of book
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: gray,
+                          ),
+                          child: DropdownButton<String>(
+                            value: _dropdownValue,
+                            isExpanded: true,
+                            hint: const Text("SELECT CONDITION",
+                                style: TextStyle(color: logobackground)),
+                            items: const [
+                              DropdownMenuItem(
+                                value: "NEW",
+                                child: Text("NEW",
+                                    style: TextStyle(color: logobackground)),
+                              ),
+                              DropdownMenuItem(
+                                value: "GREAT",
+                                child: Text("GREAT",
+                                    style: TextStyle(color: logobackground)),
+                              ),
+                              DropdownMenuItem(
+                                value: "GOOD",
+                                child: Text("GOOD",
+                                    style: TextStyle(color: logobackground)),
+                              ),
+                              DropdownMenuItem(
+                                value: "BAD",
+                                child: Text("BAD",
+                                    style: TextStyle(color: logobackground)),
+                              ),
+                              DropdownMenuItem(
+                                value: "POOR",
+                                child: Text("POOR",
+                                    style: TextStyle(color: logobackground)),
+                              ),
+                            ],
+                            onChanged: dropdownCallback,
+                          )),
+                      if (errorTextC != null) ...{
+                        Padding(
+                            padding: const EdgeInsets.only(left: 40),
+                            child: Text(
+                              errorTextC!,
+                              textAlign: TextAlign.end,
+                              style: const TextStyle(
+                                  color: Color.fromARGB(255, 225, 72, 61),
+                                  fontSize: 12),
+                            ))
+                      }
+                    ])), //drop down button for condition of book
             rounded_input_field(
-                maxLength: 200,
-                hide: false,
-                hintText: "ADDITIONAL DETAILS (optional)",
-                icon: Icons.format_align_left_sharp,
-                onChanged: (value) {
-                  description = value;
-                }),
+              maxLength: 200,
+              hide: false,
+              hintText: "ADDITIONAL DETAILS (optional)",
+              icon: Icons.format_align_left_sharp,
+              onChanged: (value) {
+                description = value;
+              },
+              onSubmitted: (p0) => listBook(context),
+            ),
+
             rounded_input_field(
+              controller: _textEditingControllerPR,
+              errorText: errorTextPR,
               maxLength: 7,
               hide: false,
               hintText: "ENTER PRICE",
               icon: Icons.attach_money,
               onChanged: (value) {
+                setState(() {
+                  errorTextPR = null;
+                });
                 price = value;
               },
+              onSubmitted: (p0) => listBook(context),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -143,59 +255,7 @@ class _SellScreenState extends State<SellScreen> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               ),
-              onPressed: () async {
-                //now validate fields
-                if (validator.validateISBN(isbn) &&
-                    validator.validatePrice(price) &&
-                    validator.validateTitle(post_title) &&
-                    _dropdownValue is String) {
-                  if (description is! String) {
-                    description = "";
-                  }
-                  Map<String, Object?>? info = await getInfo(isbn!);
-                  if (info == null) {
-                    ////ERROR: ISBN NOT FOUND, PLEASE ENTER CORRECTLY
-                    debugPrint(
-                        "Error: ISBN not found, please make sure you typed it in correctly.");
-                  } else {
-                    String finalPrice = formatPrice(price!);
-                    if (info["Image"] == null) {
-                      info["Image"] =
-                          "http://www.nipponniche.com/wp-content/uploads/2021/04/fentres-pdf.jpeg";
-                    }
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => Confirm(
-                                postTitle: post_title!,
-                                isbn: info["ISBN"],
-                                bookName: info["Name"],
-                                author: info["Author"],
-                                cond: _dropdownValue!,
-                                description: description,
-                                price: finalPrice,
-                                pic: info["Image"],
-                              )),
-                    );
-                  }
-                } else {
-                  if (!validator.validateISBN(isbn)) {
-                    debugPrint(
-                        "Error: Please enter a valid ISBN-10 or ISBN-13");
-                  }
-                  if (!validator.validatePrice(price)) {
-                    debugPrint(
-                        "Error: Please enter a price in USD format less than \$9999.99");
-                  }
-                  if (!validator.validateTitle(post_title)) {
-                    debugPrint(
-                        "Error: Title must be at least 5 characters long");
-                  }
-                  if (_dropdownValue is! String) {
-                    debugPrint(
-                        "Error: Please select a value for the condition of the textbook");
-                  }
-                }
-              },
+              onPressed: () => listBook(context),
               child: const Text(
                 "LIST BOOK",
                 style: TextStyle(
