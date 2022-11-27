@@ -7,6 +7,8 @@ class rounded_input_field extends StatelessWidget {
   final IconData? icon;
   final ValueChanged<String>? onChanged;
   final int? maxLength;
+  final void Function(String)? onSubmitted;
+  final TextEditingController? controller;
 
   const rounded_input_field({
     Key? key,
@@ -15,26 +17,29 @@ class rounded_input_field extends StatelessWidget {
     this.icon,
     this.onChanged,
     this.maxLength,
+    this.onSubmitted,
+    this.controller,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Input_text_field(
-      child: TextField(
-        maxLength: maxLength,
-        obscureText: hide,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          counterText: '',
-          icon: Icon(
-            icon,
-            color: logobackground,
-          ),
-          hintText: hintText,
-          border: InputBorder.none,
+        child: TextField(
+      controller: controller,
+      maxLength: maxLength,
+      obscureText: hide,
+      onChanged: onChanged,
+      onSubmitted: onSubmitted,
+      decoration: InputDecoration(
+        counterText: '',
+        icon: Icon(
+          icon,
+          color: logobackground,
         ),
+        hintText: hintText,
+        border: InputBorder.none,
       ),
-    );
+    ));
   }
 }
 

@@ -205,6 +205,24 @@ class UserSerialize extends DBSerialize<BindrUser> {
     return "users";
   }
 
+  Future<String?> getEmailFromHofID(String hofID) async {
+    Query query = FirebaseFirestore.instance.collection(getCollection());
+
+    query = query.where("hofid", isEqualTo: hofID);
+
+    String email = "";
+
+    await query.get().then((snapshot) {
+      for (var element in snapshot.docs) {
+        if (!element.exists) {
+          continue;
+        }
+        email = (element.data() as Map<String, dynamic>)["email"];
+      }
+    });
+    return email;
+  }
+
   @override
   BindrUser? createFrom(Map<String, dynamic> map) {
     List<String> allKeys = [
