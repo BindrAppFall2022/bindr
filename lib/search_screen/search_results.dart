@@ -1,5 +1,6 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/custom_popup_menu_item.dart';
+import 'package:bindr_app/post_views/post_view.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
@@ -528,7 +529,16 @@ class _SearchResultsState extends State<SearchResults> {
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),
                                               textColor: Colors.black,
-                                              onTap: () {}, /////
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PostView(
+                                                            postList[index]),
+                                                  ),
+                                                );
+                                              }, /////
                                             ),
                                           ),
                                         ],

@@ -8,6 +8,8 @@ import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
 import 'package:intl/intl.dart';
 
+import '../post_views/post_view.dart';
+
 class MyPosts extends StatefulWidget {
   final String searchString;
   final double barWidth;
@@ -528,7 +530,16 @@ class _MyPostsState extends State<MyPosts> {
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),
                                               textColor: Colors.black,
-                                              onTap: () {}, /////
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PostView(
+                                                            postList[index]),
+                                                  ),
+                                                );
+                                              }, /////
                                             ),
                                           ),
                                         ],

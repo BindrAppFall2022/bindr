@@ -1,5 +1,6 @@
 import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 
@@ -37,7 +38,11 @@ class SettingsScreen extends StatelessWidget {
               RoundButton(
                 backgroundcolor: Color.fromARGB(255, 215, 14, 0),
                 text: "DELETE ACCOUNT",
-                press: () {}, ///// delete account here
+                press: () {
+                  FirebaseAuth.instance.currentUser!.delete();
+                  Navigator.of(context)
+                      .popUntil((route) => !Navigator.of(context).canPop());
+                }, ///// delete account here
               ),
             ],
           ),

@@ -38,25 +38,28 @@ class Post extends DBRepresentation<Post> {
   String qTitle;
   String title;
   String userID;
+  String? documentID;
   // Manage photos later
 
-  Post(
-      {required this.author,
-      required this.bookName,
-      required this.condition,
-      required this.dateCreated,
-      required this.description,
-      required this.imageURL,
-      required this.isbn,
-      required this.lastModified,
-      required this.numBookmarks,
-      required this.postID,
-      required this.price,
-      required this.qAuthor,
-      required this.qBookName,
-      required this.qTitle,
-      required this.title,
-      required this.userID});
+  Post({
+    required this.author,
+    required this.bookName,
+    required this.condition,
+    required this.dateCreated,
+    required this.description,
+    required this.imageURL,
+    required this.isbn,
+    required this.lastModified,
+    required this.numBookmarks,
+    required this.postID,
+    required this.price,
+    required this.qAuthor,
+    required this.qBookName,
+    required this.qTitle,
+    required this.title,
+    required this.userID,
+    this.documentID,
+  });
 
   @override
   Map<String, Object?> toMap() {
@@ -134,7 +137,7 @@ class Post extends DBRepresentation<Post> {
 class BindrUser extends DBRepresentation<BindrUser> {
   Timestamp? dateCreated;
   Timestamp lastAccessed;
-  String userID;
+  String? userID;
   String email;
   String hofID;
   List<int> bookmarks;
@@ -143,7 +146,7 @@ class BindrUser extends DBRepresentation<BindrUser> {
     required this.bookmarks,
     required this.email,
     required this.hofID,
-    required this.userID,
+    this.userID,
     required this.lastAccessed,
     required this.dateCreated,
   });
@@ -151,21 +154,8 @@ class BindrUser extends DBRepresentation<BindrUser> {
   // returns the DocumentReference for firebase, or null if failed
   @override
   Future<String?> createEntry() async {
-    String? docReference;
-    await FirebaseFirestore.instance
-        .collection(getCollection())
-        .doc(userID)
-        .set(
-          toMap(),
-        )
-        .then(((value) {
-      onSuccess("");
-      docReference = userID;
-    })).catchError((error) {
-      onFailure(error);
-    });
-
-    return docReference;
+    userID = await super.createEntry();
+    updateEntry(userID!);
   }
 
   @override

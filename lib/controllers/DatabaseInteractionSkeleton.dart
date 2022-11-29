@@ -7,7 +7,7 @@ import "package:cloud_firestore/cloud_firestore.dart";
 // Use descendants of this class to retrieve data from the database
 abstract class DBSerialize<T extends DBRepresentation<T>> {
   String getCollection();
-  T? createFrom(Map<String, dynamic> map);
+  T? createFrom(Map<String, dynamic> map, String docId);
 
   Future<List<T>> getEntries(
     String key,
@@ -38,7 +38,8 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
               continue;
             }
 
-            T? item = createFrom(element.data() as Map<String, dynamic>);
+            T? item =
+                createFrom(element.data() as Map<String, dynamic>, element.id);
             if (item != null) {
               result.add(item);
             }
@@ -58,7 +59,8 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
 
     var queryRes = await coll.doc(doc).get();
 
-    T? result = createFrom(queryRes.data() as Map<String, dynamic>);
+    T? result =
+        createFrom(queryRes.data() as Map<String, dynamic>, queryRes.id);
     return result;
   }
 }
@@ -142,7 +144,7 @@ class PostSerialize extends DBSerialize<Post> {
   }
 
   @override
-  Post? createFrom(Map<String, dynamic> map) {
+  Post? createFrom(Map<String, dynamic> map, String docId) {
     List<String> allKeys = [
       "author",
       "book_name",
@@ -195,6 +197,7 @@ class PostSerialize extends DBSerialize<Post> {
       qTitle: map["q_title"],
       title: map["title"],
       userID: map["userid"],
+      documentID: docId,
     );
   }
 }
@@ -224,10 +227,10 @@ class UserSerialize extends DBSerialize<BindrUser> {
   }
 
   @override
-  BindrUser? createFrom(Map<String, dynamic> map) {
+  BindrUser? createFrom(Map<String, dynamic> map, String docId) {
     List<String> allKeys = [
-      'bookmarks'
-          "date_created",
+      'bookmarks',
+      "date_created",
       "email",
       "hofid",
       "last_access",
@@ -245,7 +248,7 @@ class UserSerialize extends DBSerialize<BindrUser> {
       email: map["email"],
       hofID: map["hofid"],
       dateCreated: map["date_created"],
-      lastAccessed: map["last-modified"],
+      lastAccessed: map["last_access"],
       userID: map["userid"],
     );
   }
@@ -253,6 +256,8 @@ class UserSerialize extends DBSerialize<BindrUser> {
 
 // Use descendants of this class to write data to the database.
 abstract class DBRepresentation<T> {
+  // Becomes populated when the entry is written to the database.
+  String? documentID;
   String getCollection();
 
   // returns the DocumentReference for firebase, or null if failed
@@ -268,7 +273,7 @@ abstract class DBRepresentation<T> {
     }).catchError((error) {
       onFailure(error);
     });
-
+    documentID = docReference;
     return docReference;
   }
 
