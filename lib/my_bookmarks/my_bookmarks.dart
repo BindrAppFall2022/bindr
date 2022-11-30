@@ -540,7 +540,11 @@ class _MyBookmarksState extends State<MyBookmarks> {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         PostView(
-                                                            postList[index]),
+                                                      postList[index],
+                                                      searchString:
+                                                          currentSearchString,
+                                                      screen: 'bookmarks',
+                                                    ),
                                                   ),
                                                 );
                                               },

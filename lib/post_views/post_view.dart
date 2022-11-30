@@ -1,5 +1,6 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/rounded_button.dart';
+import 'package:bindr_app/my_bookmarks/my_bookmarks.dart';
 import 'package:bindr_app/my_posts/my_posts.dart';
 import 'package:bindr_app/sell_screen/sell.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,10 @@ import '../models/DatabaseRepresentations.dart';
 
 class PostView extends StatefulWidget {
   final Post activePost;
+  final String? searchString;
+  final String? screen;
 
-  const PostView(this.activePost, {super.key});
+  const PostView(this.activePost, {this.searchString, this.screen, super.key});
 
   @override
   State<PostView> createState() => _PostViewState(activePost);
@@ -24,6 +27,7 @@ class _PostViewState extends State<PostView> {
   String myId = FirebaseAuth.instance.currentUser!.uid;
   bool isBookmarked = false;
   List<String> data = [];
+  bool changed = false;
 
   _PostViewState(this.activePost) {
     getData().then((value) => {
@@ -79,6 +83,22 @@ class _PostViewState extends State<PostView> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              if (widget.screen == 'bookmarks' && changed) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pushReplacement(MaterialPageRoute(
+                    builder: ((context) => MyBookmarks(
+                        searchString: widget.searchString ?? "",
+                        hasBookmarks: null)),
+                  ));
+              } else {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
           backgroundColor: logobackground,
           elevation: 0,
         ),
@@ -240,11 +260,11 @@ class _PostViewState extends State<PostView> {
                                         postid: activePost.postID,
                                         docID: activePost.documentID!);
                                     setState(() {
+                                      changed = true;
                                       isBookmarked = false;
                                       activePost.numBookmarks -= 1;
                                       data[data.length - 1] =
                                           "Bookmark count: ${activePost.numBookmarks}";
-                                      ////// -1 to num_bookmarks
                                     });
                                   }))
                               : RoundButton(
@@ -254,11 +274,11 @@ class _PostViewState extends State<PostView> {
                                         postid: activePost.postID,
                                         docID: activePost.documentID!);
                                     setState(() {
+                                      changed = true;
                                       isBookmarked = true;
                                       activePost.numBookmarks += 1;
                                       data[data.length - 1] =
                                           "Bookmark count: ${activePost.numBookmarks}";
-                                      //////add +1 to num_bookmarks
                                     });
                                   },
                                 ),
