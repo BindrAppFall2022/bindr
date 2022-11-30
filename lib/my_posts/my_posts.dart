@@ -403,11 +403,11 @@ class _MyPostsState extends State<MyPosts> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 15.0),
+                                                left: 5.0, top: 15.0),
                                             child: Image.network(
                                               postList[index].imageURL,
                                               height: 140,
-                                              width: 120,
+                                              width: 100,
                                             ),
                                           ),
                                           Positioned(

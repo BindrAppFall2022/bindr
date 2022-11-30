@@ -59,8 +59,10 @@ class _PostViewState extends State<PostView> {
           ? "Description: ${activePost.description}"
           : "",
       "Price: $price",
-      "Post created on: ${DateFormat("yMMMMEEEEd").format(activePost.dateCreated!.toDate())}",
+      "Textbook Condition: ${conditionToString[activePost.condition]}"
+          "Post created on: ${DateFormat("yMMMMEEEEd").format(activePost.dateCreated!.toDate())}",
       "Post created by ${myId == activePost.userID ? "you" : otherUser.email}",
+
       "Bookmark count: ${activePost.numBookmarks}", //KEEP AT END OF LIST
     ];
   }
@@ -235,7 +237,7 @@ class _PostViewState extends State<PostView> {
                                     setState(() {
                                       isBookmarked = false;
                                       activePost.numBookmarks -= 1;
-                                      data[7] =
+                                      data[data.length - 1] =
                                           "Bookmark count: ${activePost.numBookmarks}";
                                       ////// -1 to num_bookmarks
                                     });
@@ -249,7 +251,7 @@ class _PostViewState extends State<PostView> {
                                     setState(() {
                                       isBookmarked = true;
                                       activePost.numBookmarks += 1;
-                                      data[7] =
+                                      data[data.length - 1] =
                                           "Bookmark count: ${activePost.numBookmarks}";
                                       //////add +1 to num_bookmarks
                                     });
