@@ -180,7 +180,9 @@ class _MyPostsState extends State<MyPosts> {
 
   @override
   Widget build(BuildContext context) {
-    _controllerSearchBar.text = widget.searchString;
+    _controllerSearchBar.text = currentSearchString;
+    _controllerSearchBar.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controllerSearchBar.text.length));
     Size size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
@@ -327,9 +329,11 @@ class _MyPostsState extends State<MyPosts> {
                       child: TextField(
                         controller: _controllerSearchBar,
                         enabled: true,
+                        maxLength: 35,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: InputBorder.none,
+                          counterText: '',
                           hintText: "Enter Title, Author, or ISBN",
                           floatingLabelAlignment: FloatingLabelAlignment.center,
                           suffixIconConstraints: BoxConstraints(
@@ -512,7 +516,7 @@ class _MyPostsState extends State<MyPosts> {
                                                           .price
                                                           .length >
                                                       8) {
-                                                    return 1.0;
+                                                    return 0.95;
                                                   } else if (postList[index]
                                                           .price
                                                           .length >
