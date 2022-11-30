@@ -164,13 +164,14 @@ class Confirm extends StatelessWidget {
                   if (existingDocId != null) {
                     entry.updateEntry(existingDocId!).then((value) {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const ConfirmScreen()));
+                          builder: (context) => ConfirmScreen(entry)));
+                    });
+                  } else {
+                    entry.createEntry().then((value) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ConfirmScreen(entry)));
                     });
                   }
-                  entry.createEntry().then((value) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const ConfirmScreen()));
-                  });
 
                   //.then((value) {
                   //   Navigator.of(context)
