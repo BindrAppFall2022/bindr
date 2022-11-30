@@ -1,5 +1,6 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/rounded_button.dart';
+import 'package:bindr_app/my_posts/my_posts.dart';
 import 'package:bindr_app/sell_screen/sell.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -59,8 +60,8 @@ class _PostViewState extends State<PostView> {
           ? "Description: ${activePost.description}"
           : "",
       "Price: $price",
-      "Textbook Condition: ${conditionToString[activePost.condition]}"
-          "Post created on: ${DateFormat("yMMMMEEEEd").format(activePost.dateCreated!.toDate())}",
+      "Textbook Condition: ${conditionToString[activePost.condition]}",
+      "Post created on: ${DateFormat("yMMMMEEEEd").format(activePost.dateCreated!.toDate())}",
       "Post created by ${myId == activePost.userID ? "you" : otherUser.email}",
 
       "Bookmark count: ${activePost.numBookmarks}", //KEEP AT END OF LIST
@@ -137,7 +138,7 @@ class _PostViewState extends State<PostView> {
                                                 .size
                                                 .height *
                                             .8,
-                                        color: gray,
+                                        color: logobackground,
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -164,9 +165,15 @@ class _PostViewState extends State<PostView> {
                                                           activePost
                                                               .documentID!);
                                                       Navigator.of(context)
-                                                          .pop();
-                                                      Navigator.of(context)
-                                                          .pop();
+                                                        ..pop()
+                                                        ..pop()
+                                                        ..pushReplacement(MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const MyPosts(
+                                                                    searchString:
+                                                                        "",
+                                                                    hasPosts:
+                                                                        null)));
                                                     },
                                                   ),
                                                 ),
@@ -189,8 +196,6 @@ class _PostViewState extends State<PostView> {
                                                     text: "No",
                                                     press: () {
                                                       Navigator.of(innerContext)
-                                                          .pop();
-                                                      Navigator.of(context)
                                                           .pop();
                                                     },
                                                   ),
