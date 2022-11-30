@@ -7,6 +7,7 @@ import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
 import 'package:intl/intl.dart';
 
+import '../post_views/post_view.dart';
 import '../search_screen/search_screen.dart';
 
 class MyBookmarks extends StatefulWidget {
@@ -529,7 +530,16 @@ class _MyBookmarksState extends State<MyBookmarks> {
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),
                                               textColor: Colors.black,
-                                              onTap: () {}, /////
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PostView(
+                                                            postList[index]),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                         ],

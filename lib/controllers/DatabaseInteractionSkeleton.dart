@@ -101,6 +101,22 @@ class PostSerialize extends DBSerialize<Post> {
     return searchDB(query, null, q: postQuery);
   }
 
+  Future<bool> isBookmarked({required int postid}) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    Query query =
+        FirebaseFirestore.instance.collection(UserSerialize().getCollection());
+    bool result = await query
+        .where(FieldPath.documentId, isEqualTo: uid)
+        .where("bookmarks", arrayContains: postid)
+        .count()
+        .get()
+        .then((value) => value.count > 0)
+        .catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+    });
+    return result;
+  }
+
   Future<List<Post>> getMyBookmarks({required String query}) async {
     UserSerialize u = UserSerialize();
     String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -206,6 +222,58 @@ class UserSerialize extends DBSerialize<BindrUser> {
   @override
   String getCollection() {
     return "users";
+  }
+
+  Future<bool> addBookmark({required int postid, required String docID}) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    bool result = true;
+    await FirebaseFirestore.instance
+        .collection(getCollection())
+        .doc(uid)
+        .update({
+      "bookmarks": FieldValue.arrayUnion([postid])
+    }).catchError((error) {
+      result = false;
+      debugPrint("Failed operation with error: $error.");
+    });
+    if (result) {
+      await FirebaseFirestore.instance
+          .collection(PostSerialize().getCollection())
+          .doc(docID)
+          .update({"num_bookmarks": FieldValue.increment(1)}).catchError(
+              (error) {
+        result = false;
+        debugPrint("Failed operation with error: $error.");
+      });
+    }
+    return result;
+  }
+
+  Future<bool> removeBookmark(
+      {required int postid, required String docID}) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    bool result = true;
+    await FirebaseFirestore.instance
+        .collection(getCollection())
+        .doc(uid)
+        .update({
+      "bookmarks": FieldValue.arrayRemove([postid])
+    }).catchError((error) {
+      result = false;
+      debugPrint("Failed operation with error: $error.");
+    });
+    if (result) {
+      await FirebaseFirestore.instance
+          .collection(PostSerialize().getCollection())
+          .doc(docID)
+          .update({"num_bookmarks": FieldValue.increment(-1)}).catchError(
+              (error) {
+        result = false;
+        debugPrint("Failed operation with error: $error.");
+      });
+    }
+
+    return result;
   }
 
   Future<String?> getEmailFromHofID(String hofID) async {

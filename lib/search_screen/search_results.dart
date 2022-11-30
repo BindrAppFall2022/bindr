@@ -397,16 +397,18 @@ class _SearchResultsState extends State<SearchResults> {
                                   return Material(
                                     type: MaterialType.transparency,
                                     child: Padding(
-                                      padding: const EdgeInsets.only(top: 5),
+                                      padding: const EdgeInsets.only(
+                                        top: 5,
+                                      ),
                                       child: Stack(
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 15.0),
+                                                top: 15.0, left: 5),
                                             child: Image.network(
                                               postList[index].imageURL,
                                               height: 140,
-                                              width: 120,
+                                              width: 100,
                                             ),
                                           ),
                                           Positioned(
@@ -538,7 +540,7 @@ class _SearchResultsState extends State<SearchResults> {
                                                             postList[index]),
                                                   ),
                                                 );
-                                              }, /////
+                                              },
                                             ),
                                           ),
                                         ],

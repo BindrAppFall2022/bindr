@@ -36,10 +36,10 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               RoundButton(
-                backgroundcolor: Color.fromARGB(255, 215, 14, 0),
+                backgroundcolor: const Color.fromARGB(255, 215, 14, 0),
                 text: "DELETE ACCOUNT",
                 press: () {
-                  FirebaseAuth.instance.currentUser!.delete();
+                  ///////////////FirebaseAuth.instance.currentUser!.delete();
                   Navigator.of(context)
                       .popUntil((route) => !Navigator.of(context).canPop());
                 }, ///// delete account here

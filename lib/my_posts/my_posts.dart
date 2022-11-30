@@ -539,7 +539,7 @@ class _MyPostsState extends State<MyPosts> {
                                                             postList[index]),
                                                   ),
                                                 );
-                                              }, /////
+                                              },
                                             ),
                                           ),
                                         ],

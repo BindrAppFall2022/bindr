@@ -42,7 +42,7 @@ class _SellScreenState extends State<SellScreen> {
   Post? currentPost;
   _SellScreenState(this.currentPost) {
     if (currentPost != null) {
-      // _textEditingControllerC.text = conditionToString[currentPost!.condition]!;
+      _textEditingControllerC.text = conditionToString[currentPost!.condition]!;
       _dropdownValue = conditionToString[currentPost!.condition]!;
       _textEditingControllerI.text = currentPost!.isbn;
       isbn = currentPost!.isbn;
@@ -103,7 +103,7 @@ class _SellScreenState extends State<SellScreen> {
       if (!validator.validateTitle(postTitle)) {
         errorTextPT = "Error: Title must be at least 3 characters long";
       }
-      if (_dropdownValue == "") {
+      if (_dropdownValue == "" || _dropdownValue == "SELECT CONDITION") {
         errorTextC = "Error: Please select a condition value";
       }
     }
@@ -139,177 +139,195 @@ class _SellScreenState extends State<SellScreen> {
           elevation: 0,
         ),
         backgroundColor: logobackground,
-        drawer: BindrDrawer(currentPage: "SELL BOOK"),
+        drawer: (currentPost == null)
+            ? BindrDrawer(currentPage: "SELL BOOK")
+            : null,
         body: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                  alignment: Alignment.topCenter,
-                  child: const Text(
-                    "SELL YOUR BOOK",
-                    style: TextStyle(color: pink, fontSize: 35),
-                  )),
-              rounded_input_field(
-                controller: _textEditingControllerPT,
-                errorText: errorTextPT,
-                maxLength: 50,
-                hide: false,
-                hintText: "ENTER TITLE OF LISTING",
-                icon: Icons.title_sharp,
-                onChanged: (value) {
-                  setState(() {
-                    errorTextPT = "";
-                  });
-                  postTitle = value;
-                },
-                // onSubmitted: (p0) => listBook(context),
-              ),
-              rounded_input_field(
-                controller: _textEditingControllerI,
-                errorText: errorTextI,
-                maxLength: 13,
-                hide: false,
-                hintText: "ENTER ISBN",
-                icon: Icons.book_sharp,
-                onChanged: (value) {
-                  setState(() {
-                    errorTextI = "";
-                  });
-                  isbn = value;
-                },
-                // onSubmitted: (p0) => listBook(context),
-              ),
-              Container(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  width: size.width * 0.8,
-                  decoration: BoxDecoration(
-                    color: gray,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Theme(
-                            data: Theme.of(context).copyWith(
-                              canvasColor: gray,
-                            ),
-                            child: DropdownButton<String>(
-                              value: null,
-                              isExpanded: true,
-                              hint: const Text("SELECT CONDITION",
-                                  style: TextStyle(color: logobackground)),
-                              items: const [
-                                DropdownMenuItem(
-                                  value: "NEW",
-                                  child: Text("NEW",
-                                      style: TextStyle(color: logobackground)),
-                                ),
-                                DropdownMenuItem(
-                                  value: "GREAT",
-                                  child: Text("GREAT",
-                                      style: TextStyle(color: logobackground)),
-                                ),
-                                DropdownMenuItem(
-                                  value: "GOOD",
-                                  child: Text("GOOD",
-                                      style: TextStyle(color: logobackground)),
-                                ),
-                                DropdownMenuItem(
-                                  value: "BAD",
-                                  child: Text("BAD",
-                                      style: TextStyle(color: logobackground)),
-                                ),
-                                DropdownMenuItem(
-                                  value: "POOR",
-                                  child: Text("POOR",
-                                      style: TextStyle(color: logobackground)),
-                                ),
-                              ],
-                              onChanged: dropdownCallback,
-                            )),
-                        if (errorTextC != "") ...{
-                          Padding(
-                              padding: const EdgeInsets.only(left: 40),
-                              child: Text(
-                                errorTextC,
-                                textAlign: TextAlign.end,
-                                style: const TextStyle(
-                                    color: Color.fromARGB(255, 225, 72, 61),
-                                    fontSize: 12),
-                              ))
-                        }
-                      ])), //drop down button for condition of book
-              rounded_input_field(
-                maxLength: 200,
-                hide: false,
-                hintText: "ADDITIONAL DETAILS (optional)",
-                icon: Icons.format_align_left_sharp,
-                onChanged: (value) {
-                  description = value;
-                },
-                controller:
-                    TextEditingController(text: currentPost?.description ?? ""),
-                // onSubmitted: (p0) => listBook(context),
-              ),
+          child: Padding(
+            padding: EdgeInsets.only(top: size.height * 0.05),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                    alignment: Alignment.topCenter,
+                    child: const Text(
+                      "SELL YOUR BOOK",
+                      style: TextStyle(color: pink, fontSize: 35),
+                    )),
+                rounded_input_field(
+                  controller: _textEditingControllerPT,
+                  errorText: errorTextPT,
+                  maxLength: 50,
+                  hide: false,
+                  hintText: "ENTER TITLE OF LISTING",
+                  icon: Icons.title_sharp,
+                  onChanged: (value) {
+                    setState(() {
+                      errorTextPT = "";
+                    });
+                    postTitle = value;
+                  },
+                  // onSubmitted: (p0) => listBook(context),
+                ),
+                rounded_input_field(
+                  controller: _textEditingControllerI,
+                  errorText: errorTextI,
+                  maxLength: 13,
+                  hide: false,
+                  hintText: "ENTER ISBN",
+                  icon: Icons.book_sharp,
+                  onChanged: (value) {
+                    setState(() {
+                      errorTextI = "";
+                    });
+                    isbn = value;
+                  },
+                  // onSubmitted: (p0) => listBook(context),
+                ),
+                Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    width: size.width * 0.8,
+                    decoration: BoxDecoration(
+                      color: gray,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Theme(
+                              data: Theme.of(context).copyWith(
+                                canvasColor: gray,
+                              ),
+                              child: DropdownButton<String>(
+                                value: _dropdownValue,
+                                isExpanded: true,
+                                hint: const Text("SELECT CONDITION",
+                                    style: TextStyle(color: logobackground)),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: "SELECT CONDITION",
+                                    child: Text("SELECT CONDITION",
+                                        style:
+                                            TextStyle(color: logobackground)),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "NEW",
+                                    child: Text("NEW",
+                                        style:
+                                            TextStyle(color: logobackground)),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "GREAT",
+                                    child: Text("GREAT",
+                                        style:
+                                            TextStyle(color: logobackground)),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "GOOD",
+                                    child: Text("GOOD",
+                                        style:
+                                            TextStyle(color: logobackground)),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "BAD",
+                                    child: Text("BAD",
+                                        style:
+                                            TextStyle(color: logobackground)),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "POOR",
+                                    child: Text("POOR",
+                                        style:
+                                            TextStyle(color: logobackground)),
+                                  ),
+                                ],
+                                onChanged: dropdownCallback,
+                              )),
+                          if (errorTextC != "") ...{
+                            Padding(
+                                padding: const EdgeInsets.only(left: 40),
+                                child: Text(
+                                  errorTextC,
+                                  textAlign: TextAlign.end,
+                                  style: const TextStyle(
+                                      color: Color.fromARGB(255, 225, 72, 61),
+                                      fontSize: 12),
+                                ))
+                          }
+                        ])), //drop down button for condition of book
+                rounded_input_field(
+                  maxLength: 200,
+                  hide: false,
+                  hintText: "ADDITIONAL DETAILS (optional)",
+                  icon: Icons.format_align_left_sharp,
+                  onChanged: (value) {
+                    description = value;
+                  },
+                  controller: TextEditingController(
+                      text: currentPost?.description ?? ""),
+                  // onSubmitted: (p0) => listBook(context),
+                ),
 
-              rounded_input_field(
-                controller: _textEditingControllerPR,
-                errorText: errorTextPR,
-                maxLength: 7,
-                hide: false,
-                hintText: "ENTER PRICE",
-                icon: Icons.attach_money,
-                onChanged: (value) {
-                  setState(() {
-                    errorTextPR = "";
-                  });
-                  price = value;
-                },
-                // onSubmitted: (p0) => listBook(context),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: pink,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                rounded_input_field(
+                  controller: _textEditingControllerPR,
+                  errorText: errorTextPR,
+                  maxLength: 7,
+                  hide: false,
+                  hintText: "ENTER PRICE",
+                  icon: Icons.attach_money,
+                  onChanged: (value) {
+                    setState(() {
+                      errorTextPR = "";
+                    });
+                    price = value;
+                  },
+                  // onSubmitted: (p0) => listBook(context),
                 ),
-                onPressed: () => listBook(context,
-                    updateExisting:
-                        currentPost == null || currentPost!.documentID == null),
-                child: Text(
-                  (currentPost == null ? "List Book" : "Update Listing"),
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: pink,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 20),
+                  ),
+                  onPressed: () => listBook(context,
+                      updateExisting: currentPost == null ||
+                          currentPost!.documentID == null),
+                  child: Text(
+                    (currentPost == null ? "List Book" : "Update Listing"),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: pink,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                const SizedBox(
+                  height: 10,
                 ),
-                onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => SearchScreen()));
-                },
-                child: const Text(
-                  "GO HOME",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
-                ),
-              )
-            ],
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: pink,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 20),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SearchScreen()));
+                  },
+                  child: const Text(
+                    "GO HOME",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

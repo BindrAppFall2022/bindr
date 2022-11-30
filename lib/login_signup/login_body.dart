@@ -56,9 +56,12 @@ class _LoginBodyState extends State<LoginBody> {
     String? error = await auth.signIn(emailString, passwordString);
     if (error == null) {
       // ignore: use_build_context_synchronously
-      if (await auth.isVerified()) {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => SearchScreen()));
+      bool isVerified = await auth.isVerified();
+      if (isVerified) {
+        //future builder returns search screen
+        // Navigator.of(context).pushReplacement(
+        //     MaterialPageRoute(builder: (context) => SearchScreen()));
+        Navigator.of(context).pop();
       } else {
         Navigator.of(context).push(HeroDialogueRoute(
           true,
