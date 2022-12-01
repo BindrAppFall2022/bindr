@@ -108,6 +108,12 @@ class Post extends DBRepresentation<Post> {
   }
 
   @override
+  Future<bool> deleteEntry(String doc) {
+    UserSerialize().removeBookmarksOfPostIDList([postID]);
+    return super.deleteEntry(doc);
+  }
+
+  @override
   void onSuccess(value) {
     debugPrint("Successful operation on user with id: $userID.");
   }
@@ -146,7 +152,7 @@ class BindrUser extends DBRepresentation<BindrUser> {
     required this.bookmarks,
     required this.email,
     required this.hofID,
-    this.userID,
+    required this.userID,
     required this.lastAccessed,
     required this.dateCreated,
   });
@@ -154,8 +160,20 @@ class BindrUser extends DBRepresentation<BindrUser> {
   // returns the DocumentReference for firebase, or null if failed
   @override
   Future<String?> createEntry() async {
-    userID = await super.createEntry();
-    updateEntry(userID!);
+    String? docReference;
+    await FirebaseFirestore.instance
+        .collection(getCollection())
+        .doc(userID)
+        .set(
+          toMap(),
+        )
+        .then(((value) {
+      onSuccess("");
+      docReference = userID;
+    })).catchError((error) {
+      onFailure(error);
+    });
+    return docReference;
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:bindr_app/items/constants.dart';
 import 'package:bindr_app/models/DatabaseRepresentations.dart';
+import 'package:bindr_app/my_posts/my_posts.dart';
 import 'package:bindr_app/post_views/post_view.dart';
 import 'package:bindr_app/search_screen/search_screen.dart';
 import 'package:flutter/material.dart';
@@ -36,10 +37,12 @@ class ConfirmScreen extends StatelessWidget {
                           backgroundColor: logobackground,
                         ),
                         onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => PostView(currentPost)));
+                          Navigator.of(context)
+                            ..pop()
+                            ..pop()
+                            ..pushReplacement(MaterialPageRoute(
+                                builder: (context) => const MyPosts(
+                                    searchString: "", hasPosts: null)));
                         },
                         child: const Text(
                           "PRESS TO CONTINUE",

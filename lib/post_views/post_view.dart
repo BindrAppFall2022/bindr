@@ -165,7 +165,9 @@ class _PostViewState extends State<PostView> {
                                           children: [
                                             const Text(
                                               "Are you sure you want to delete this post?",
-                                              style: TextStyle(fontSize: 24),
+                                              style: TextStyle(
+                                                  fontSize: 24,
+                                                  color: Colors.red),
                                             ),
                                             Row(
                                               mainAxisAlignment:

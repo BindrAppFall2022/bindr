@@ -25,7 +25,7 @@ class _SellScreenState extends State<SellScreen> {
   final TextEditingController _textEditingControllerPR =
       TextEditingController();
 
-  String errorTextPT = "", errorTextI = "", errorTextC = "", errorTextPR = "";
+  String? errorTextPT, errorTextI, errorTextC, errorTextPR;
 
   String postTitle = "";
 
@@ -57,6 +57,7 @@ class _SellScreenState extends State<SellScreen> {
     if (selectedValue is String) {
       setState(() {
         _dropdownValue = selectedValue;
+        errorTextC = null;
       });
     }
   }
@@ -163,7 +164,7 @@ class _SellScreenState extends State<SellScreen> {
                   icon: Icons.title_sharp,
                   onChanged: (value) {
                     setState(() {
-                      errorTextPT = "";
+                      errorTextPT = null;
                     });
                     postTitle = value;
                   },
@@ -178,7 +179,7 @@ class _SellScreenState extends State<SellScreen> {
                   icon: Icons.book_sharp,
                   onChanged: (value) {
                     setState(() {
-                      errorTextI = "";
+                      errorTextI = null;
                     });
                     isbn = value;
                   },
@@ -246,11 +247,11 @@ class _SellScreenState extends State<SellScreen> {
                                 ],
                                 onChanged: dropdownCallback,
                               )),
-                          if (errorTextC != "") ...{
+                          if (errorTextC != null) ...{
                             Padding(
                                 padding: const EdgeInsets.only(left: 40),
                                 child: Text(
-                                  errorTextC,
+                                  errorTextC!,
                                   textAlign: TextAlign.end,
                                   style: const TextStyle(
                                       color: Color.fromARGB(255, 225, 72, 61),
@@ -280,7 +281,7 @@ class _SellScreenState extends State<SellScreen> {
                   icon: Icons.attach_money,
                   onChanged: (value) {
                     setState(() {
-                      errorTextPR = "";
+                      errorTextPR = null;
                     });
                     price = value;
                   },

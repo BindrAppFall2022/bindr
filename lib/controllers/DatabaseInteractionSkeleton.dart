@@ -142,7 +142,6 @@ class PostSerialize extends DBSerialize<Post> {
     Query? q,
   }) async {
     Set<Post> result = <Post>{};
-    /////add book_name as a field
     for (String property in ["q_author", "q_title", "isbn", "q_book_name"]) {
       List<Post> curList = await getEntries(property, query, pageLimit,
           orderBy: orderBy,
@@ -274,6 +273,97 @@ class UserSerialize extends DBSerialize<BindrUser> {
     }
 
     return result;
+  }
+
+  //For each postID, delete other user's bookmarks of that post
+  removeBookmarksOfPostIDList(List<int> postIDs) async {
+    if (postIDs.isEmpty) {
+      return false;
+    }
+
+    bool hadError = false;
+
+    Query bookmarksQuery =
+        FirebaseFirestore.instance.collection(getCollection());
+
+    final batch = FirebaseFirestore.instance.batch();
+
+    await bookmarksQuery
+        .where("bookmarks", arrayContainsAny: postIDs)
+        .get()
+        .then((snapshot) {
+      for (var element in snapshot.docs) {
+        var ref = element.reference;
+        batch.update(ref, {"bookmarks": FieldValue.arrayRemove(postIDs)});
+        // List<int> bookmarksList = element.get("Bookmarks") as List<int>;
+        // bookmarksList.removeWhere((item) => postIDs.contains(item));
+      }
+    }).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    if (hadError) {
+      return false;
+    }
+
+    //commit the updates
+    batch.commit().then((value) => {}).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    return !hadError;
+  }
+
+  // returns true on success and false on failure
+  Future<bool> deleteUser() async {
+    bool hadError = false;
+    String userid = FirebaseAuth.instance.currentUser!.uid;
+    //Delete Posts made by user and track all postIDs to remove
+    List<int> postIDs = <int>[];
+    Query postQuery =
+        FirebaseFirestore.instance.collection(PostSerialize().getCollection());
+    await postQuery.where("userid", isEqualTo: userid).get().then(
+      (snapshot) async {
+        for (QueryDocumentSnapshot<Object?> element in snapshot.docs) {
+          if (!element.exists) {
+            continue;
+          }
+          postIDs.add(element.get("postid") as int);
+          await element.reference.delete();
+        }
+      },
+    ).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    if (hadError) {
+      return false;
+    }
+
+    hadError = await UserSerialize().removeBookmarksOfPostIDList(postIDs);
+
+    if (hadError) {
+      return false;
+    }
+
+    //Delete user entry and auth entry
+
+    CollectionReference coll =
+        FirebaseFirestore.instance.collection(getCollection());
+
+    await coll.doc(userid).delete().then((value) {
+      debugPrint("User Deleted");
+    }).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    await FirebaseAuth.instance.currentUser!.delete();
+
+    return !hadError;
   }
 
   Future<String?> getEmailFromHofID(String hofID) async {
