@@ -73,6 +73,8 @@ class SettingsScreen extends StatelessWidget {
                                           Navigator.of(context).popUntil(
                                               (route) => !Navigator.of(context)
                                                   .canPop());
+                                          Navigator.of(context)
+                                              .pushReplacementNamed('/welcome');
                                         },
                                       ),
                                     ),
