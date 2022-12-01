@@ -243,7 +243,12 @@ class _PostViewState extends State<PostView> {
                               BindrUser? user = await UserSerialize()
                                   .readEntry(activePost.userID);
                               if (user != null) {
-                                String mailURL = "mailto:${user.email}";
+                                String subject =
+                                    "RE: Bindr Listing Titled \"${activePost.title}\"";
+                                String body =
+                                    "Dear ${user.email},\n\n(Message)\n\nRegards,\n(Your Name Here)";
+                                String mailURL =
+                                    "mailto:${user.email}?subject=$subject&body=$body";
                                 try {
                                   launchUrl(Uri.parse(mailURL));
                                 } catch (e) {
