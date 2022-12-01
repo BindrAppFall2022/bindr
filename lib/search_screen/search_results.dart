@@ -1,5 +1,6 @@
 import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/custom_popup_menu_item.dart';
+import 'package:bindr_app/post_views/post_view.dart';
 import 'package:flutter/material.dart';
 import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
@@ -29,6 +30,7 @@ class _SearchResultsState extends State<SearchResults> {
   bool _showBackToTopButton = false;
 
   late String currentSearchString;
+  String? errorTextSearch;
 
   int itemsPerLoad = 10; //num_items before loading more
 
@@ -170,7 +172,9 @@ class _SearchResultsState extends State<SearchResults> {
 
   @override
   Widget build(BuildContext context) {
-    _controllerSearchBar.text = widget.searchString;
+    _controllerSearchBar.text = currentSearchString;
+    _controllerSearchBar.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controllerSearchBar.text.length));
     Size size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
@@ -316,9 +320,12 @@ class _SearchResultsState extends State<SearchResults> {
                       child: TextField(
                         controller: _controllerSearchBar,
                         enabled: true,
+                        maxLength: 35,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: InputBorder.none,
+                          counterText: '',
+                          errorText: errorTextSearch,
                           hintText: "Enter Title, Author, or ISBN",
                           floatingLabelAlignment: FloatingLabelAlignment.center,
                           suffixIconConstraints: BoxConstraints(
@@ -346,8 +353,10 @@ class _SearchResultsState extends State<SearchResults> {
                                                 descending: descending,
                                               )));
                                 } else {
-                                  /////pop up
-                                  debugPrint("ERROR: Search String is empty");
+                                  setState(() {
+                                    errorTextSearch =
+                                        "  ERROR: Search text cannot be empty";
+                                  });
                                 }
                               },
                               icon: const Icon(
@@ -369,12 +378,18 @@ class _SearchResultsState extends State<SearchResults> {
                                           descending: descending,
                                         )));
                           } else {
-                            /////pop up
-                            debugPrint("ERROR: Search String is empty");
+                            setState(() {
+                              errorTextSearch =
+                                  "  ERROR: Search text cannot be empty";
+                              currentSearchString = currentSearchString;
+                            });
                           }
                         },
                         onChanged: (String text) {
-                          currentSearchString = text;
+                          setState(() {
+                            currentSearchString = text;
+                            errorTextSearch = null;
+                          });
                         },
                       ),
                     ),
@@ -396,16 +411,18 @@ class _SearchResultsState extends State<SearchResults> {
                                   return Material(
                                     type: MaterialType.transparency,
                                     child: Padding(
-                                      padding: const EdgeInsets.only(top: 5),
+                                      padding: const EdgeInsets.only(
+                                        top: 5,
+                                      ),
                                       child: Stack(
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 15.0),
+                                                top: 15.0, left: 5),
                                             child: Image.network(
                                               postList[index].imageURL,
                                               height: 140,
-                                              width: 120,
+                                              width: 100,
                                             ),
                                           ),
                                           Positioned(
@@ -510,7 +527,7 @@ class _SearchResultsState extends State<SearchResults> {
                                                           .price
                                                           .length >
                                                       8) {
-                                                    return 1.0;
+                                                    return 0.95;
                                                   } else if (postList[index]
                                                           .price
                                                           .length >
@@ -528,7 +545,16 @@ class _SearchResultsState extends State<SearchResults> {
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),
                                               textColor: Colors.black,
-                                              onTap: () {}, /////
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PostView(
+                                                            postList[index]),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                         ],

@@ -7,7 +7,7 @@ import "package:cloud_firestore/cloud_firestore.dart";
 // Use descendants of this class to retrieve data from the database
 abstract class DBSerialize<T extends DBRepresentation<T>> {
   String getCollection();
-  T? createFrom(Map<String, dynamic> map);
+  T? createFrom(Map<String, dynamic> map, String docId);
 
   Future<List<T>> getEntries(
     String key,
@@ -38,7 +38,8 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
               continue;
             }
 
-            T? item = createFrom(element.data() as Map<String, dynamic>);
+            T? item =
+                createFrom(element.data() as Map<String, dynamic>, element.id);
             if (item != null) {
               result.add(item);
             }
@@ -58,7 +59,8 @@ abstract class DBSerialize<T extends DBRepresentation<T>> {
 
     var queryRes = await coll.doc(doc).get();
 
-    T? result = createFrom(queryRes.data() as Map<String, dynamic>);
+    T? result =
+        createFrom(queryRes.data() as Map<String, dynamic>, queryRes.id);
     return result;
   }
 }
@@ -99,6 +101,22 @@ class PostSerialize extends DBSerialize<Post> {
     return searchDB(query, null, q: postQuery);
   }
 
+  Future<bool> isBookmarked({required int postid}) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    Query query =
+        FirebaseFirestore.instance.collection(UserSerialize().getCollection());
+    bool result = await query
+        .where(FieldPath.documentId, isEqualTo: uid)
+        .where("bookmarks", arrayContains: postid)
+        .count()
+        .get()
+        .then((value) => value.count > 0)
+        .catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+    });
+    return result;
+  }
+
   Future<List<Post>> getMyBookmarks({required String query}) async {
     UserSerialize u = UserSerialize();
     String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -124,7 +142,6 @@ class PostSerialize extends DBSerialize<Post> {
     Query? q,
   }) async {
     Set<Post> result = <Post>{};
-    /////add book_name as a field
     for (String property in ["q_author", "q_title", "isbn", "q_book_name"]) {
       List<Post> curList = await getEntries(property, query, pageLimit,
           orderBy: orderBy,
@@ -142,7 +159,7 @@ class PostSerialize extends DBSerialize<Post> {
   }
 
   @override
-  Post? createFrom(Map<String, dynamic> map) {
+  Post? createFrom(Map<String, dynamic> map, String docId) {
     List<String> allKeys = [
       "author",
       "book_name",
@@ -195,6 +212,7 @@ class PostSerialize extends DBSerialize<Post> {
       qTitle: map["q_title"],
       title: map["title"],
       userID: map["userid"],
+      documentID: docId,
     );
   }
 }
@@ -203,6 +221,149 @@ class UserSerialize extends DBSerialize<BindrUser> {
   @override
   String getCollection() {
     return "users";
+  }
+
+  Future<bool> addBookmark({required int postid, required String docID}) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    bool result = true;
+    await FirebaseFirestore.instance
+        .collection(getCollection())
+        .doc(uid)
+        .update({
+      "bookmarks": FieldValue.arrayUnion([postid])
+    }).catchError((error) {
+      result = false;
+      debugPrint("Failed operation with error: $error.");
+    });
+    if (result) {
+      await FirebaseFirestore.instance
+          .collection(PostSerialize().getCollection())
+          .doc(docID)
+          .update({"num_bookmarks": FieldValue.increment(1)}).catchError(
+              (error) {
+        result = false;
+        debugPrint("Failed operation with error: $error.");
+      });
+    }
+    return result;
+  }
+
+  Future<bool> removeBookmark(
+      {required int postid, required String docID}) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    bool result = true;
+    await FirebaseFirestore.instance
+        .collection(getCollection())
+        .doc(uid)
+        .update({
+      "bookmarks": FieldValue.arrayRemove([postid])
+    }).catchError((error) {
+      result = false;
+      debugPrint("Failed operation with error: $error.");
+    });
+    if (result) {
+      await FirebaseFirestore.instance
+          .collection(PostSerialize().getCollection())
+          .doc(docID)
+          .update({"num_bookmarks": FieldValue.increment(-1)}).catchError(
+              (error) {
+        result = false;
+        debugPrint("Failed operation with error: $error.");
+      });
+    }
+
+    return result;
+  }
+
+  //For each postID, delete other user's bookmarks of that post
+  removeBookmarksOfPostIDList(List<int> postIDs) async {
+    if (postIDs.isEmpty) {
+      return false;
+    }
+
+    bool hadError = false;
+
+    Query bookmarksQuery =
+        FirebaseFirestore.instance.collection(getCollection());
+
+    final batch = FirebaseFirestore.instance.batch();
+
+    await bookmarksQuery
+        .where("bookmarks", arrayContainsAny: postIDs)
+        .get()
+        .then((snapshot) {
+      for (var element in snapshot.docs) {
+        var ref = element.reference;
+        batch.update(ref, {"bookmarks": FieldValue.arrayRemove(postIDs)});
+        // List<int> bookmarksList = element.get("Bookmarks") as List<int>;
+        // bookmarksList.removeWhere((item) => postIDs.contains(item));
+      }
+    }).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    if (hadError) {
+      return false;
+    }
+
+    //commit the updates
+    batch.commit().then((value) => {}).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    return !hadError;
+  }
+
+  // returns true on success and false on failure
+  Future<bool> deleteUser() async {
+    bool hadError = false;
+    String userid = FirebaseAuth.instance.currentUser!.uid;
+    //Delete Posts made by user and track all postIDs to remove
+    List<int> postIDs = <int>[];
+    Query postQuery =
+        FirebaseFirestore.instance.collection(PostSerialize().getCollection());
+    await postQuery.where("userid", isEqualTo: userid).get().then(
+      (snapshot) async {
+        for (QueryDocumentSnapshot<Object?> element in snapshot.docs) {
+          if (!element.exists) {
+            continue;
+          }
+          postIDs.add(element.get("postid") as int);
+          await element.reference.delete();
+        }
+      },
+    ).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    if (hadError) {
+      return false;
+    }
+
+    hadError = await UserSerialize().removeBookmarksOfPostIDList(postIDs);
+
+    if (hadError) {
+      return false;
+    }
+
+    //Delete user entry and auth entry
+
+    CollectionReference coll =
+        FirebaseFirestore.instance.collection(getCollection());
+
+    await coll.doc(userid).delete().then((value) {
+      debugPrint("User Deleted");
+    }).catchError((error) {
+      debugPrint("Failed operation with error: $error.");
+      hadError = true;
+    });
+
+    await FirebaseAuth.instance.currentUser!.delete();
+
+    return !hadError;
   }
 
   Future<String?> getEmailFromHofID(String hofID) async {
@@ -224,10 +385,10 @@ class UserSerialize extends DBSerialize<BindrUser> {
   }
 
   @override
-  BindrUser? createFrom(Map<String, dynamic> map) {
+  BindrUser? createFrom(Map<String, dynamic> map, String docId) {
     List<String> allKeys = [
-      'bookmarks'
-          "date_created",
+      'bookmarks',
+      "date_created",
       "email",
       "hofid",
       "last_access",
@@ -245,7 +406,7 @@ class UserSerialize extends DBSerialize<BindrUser> {
       email: map["email"],
       hofID: map["hofid"],
       dateCreated: map["date_created"],
-      lastAccessed: map["last-modified"],
+      lastAccessed: map["last_access"],
       userID: map["userid"],
     );
   }
@@ -253,6 +414,8 @@ class UserSerialize extends DBSerialize<BindrUser> {
 
 // Use descendants of this class to write data to the database.
 abstract class DBRepresentation<T> {
+  // Becomes populated when the entry is written to the database.
+  String? documentID;
   String getCollection();
 
   // returns the DocumentReference for firebase, or null if failed
@@ -268,7 +431,7 @@ abstract class DBRepresentation<T> {
     }).catchError((error) {
       onFailure(error);
     });
-
+    documentID = docReference;
     return docReference;
   }
 

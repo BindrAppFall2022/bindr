@@ -38,25 +38,28 @@ class Post extends DBRepresentation<Post> {
   String qTitle;
   String title;
   String userID;
+  String? documentID;
   // Manage photos later
 
-  Post(
-      {required this.author,
-      required this.bookName,
-      required this.condition,
-      required this.dateCreated,
-      required this.description,
-      required this.imageURL,
-      required this.isbn,
-      required this.lastModified,
-      required this.numBookmarks,
-      required this.postID,
-      required this.price,
-      required this.qAuthor,
-      required this.qBookName,
-      required this.qTitle,
-      required this.title,
-      required this.userID});
+  Post({
+    required this.author,
+    required this.bookName,
+    required this.condition,
+    required this.dateCreated,
+    required this.description,
+    required this.imageURL,
+    required this.isbn,
+    required this.lastModified,
+    required this.numBookmarks,
+    required this.postID,
+    required this.price,
+    required this.qAuthor,
+    required this.qBookName,
+    required this.qTitle,
+    required this.title,
+    required this.userID,
+    this.documentID,
+  });
 
   @override
   Map<String, Object?> toMap() {
@@ -105,6 +108,12 @@ class Post extends DBRepresentation<Post> {
   }
 
   @override
+  Future<bool> deleteEntry(String doc) {
+    UserSerialize().removeBookmarksOfPostIDList([postID]);
+    return super.deleteEntry(doc);
+  }
+
+  @override
   void onSuccess(value) {
     debugPrint("Successful operation on user with id: $userID.");
   }
@@ -134,7 +143,7 @@ class Post extends DBRepresentation<Post> {
 class BindrUser extends DBRepresentation<BindrUser> {
   Timestamp? dateCreated;
   Timestamp lastAccessed;
-  String userID;
+  String? userID;
   String email;
   String hofID;
   List<int> bookmarks;
@@ -164,7 +173,6 @@ class BindrUser extends DBRepresentation<BindrUser> {
     })).catchError((error) {
       onFailure(error);
     });
-
     return docReference;
   }
 

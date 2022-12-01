@@ -105,8 +105,7 @@ class _SignUpBodyState extends State<SignUpBody> {
                 buttonFunc: () {
                   //pop to allow backwards swipe to take to Welcome instead of Signup
                   Navigator.of(context)
-                    ..pop()
-                    ..pop()
+                    ..popUntil((route) => !Navigator.of(context).canPop())
                     ..pushNamed('/welcome/login');
                 },
                 descText:
@@ -129,6 +128,7 @@ class _SignUpBodyState extends State<SignUpBody> {
         await auth.signIn(emailString, passwordString);
         await auth.sendVerificationEmail();
         await auth.signOut();
+        isLoading = false;
       }
     } else {
       //check the rest of the cases here
@@ -143,19 +143,21 @@ class _SignUpBodyState extends State<SignUpBody> {
         errorTextPM = "Error: Password must match the password you entered";
       }
     }
-    setState(() {
-      isLoading = false;
-      _textEditingControllerE.text = emailString;
-      _textEditingControllerEM.text = confirmEmailString;
-      _textEditingControllerP.text = passwordString;
-      _textEditingControllerPM.text = confirmPasswordString;
-      _textEditingControllerU.text = hofID;
-      errorTextU = errorTextU;
-      errorTextP = errorTextP;
-      errorTextPM = errorTextPM;
-      errorTextE = errorTextE;
-      errorTextEM = errorTextEM;
-    });
+    if (isLoading) {
+      setState(() {
+        isLoading = false;
+        _textEditingControllerE.text = emailString;
+        _textEditingControllerEM.text = confirmEmailString;
+        _textEditingControllerP.text = passwordString;
+        _textEditingControllerPM.text = confirmPasswordString;
+        _textEditingControllerU.text = hofID;
+        errorTextU = errorTextU;
+        errorTextP = errorTextP;
+        errorTextPM = errorTextPM;
+        errorTextE = errorTextE;
+        errorTextEM = errorTextEM;
+      });
+    }
   }
 
   @override

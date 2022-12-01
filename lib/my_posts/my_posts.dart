@@ -8,6 +8,8 @@ import '../items/constants.dart';
 import '../models/DatabaseRepresentations.dart';
 import 'package:intl/intl.dart';
 
+import '../post_views/post_view.dart';
+
 class MyPosts extends StatefulWidget {
   final String searchString;
   final double barWidth;
@@ -178,7 +180,9 @@ class _MyPostsState extends State<MyPosts> {
 
   @override
   Widget build(BuildContext context) {
-    _controllerSearchBar.text = widget.searchString;
+    _controllerSearchBar.text = currentSearchString;
+    _controllerSearchBar.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controllerSearchBar.text.length));
     Size size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
@@ -325,9 +329,11 @@ class _MyPostsState extends State<MyPosts> {
                       child: TextField(
                         controller: _controllerSearchBar,
                         enabled: true,
+                        maxLength: 35,
                         textAlign: TextAlign.center,
                         decoration: InputDecoration(
                           border: InputBorder.none,
+                          counterText: '',
                           hintText: "Enter Title, Author, or ISBN",
                           floatingLabelAlignment: FloatingLabelAlignment.center,
                           suffixIconConstraints: BoxConstraints(
@@ -401,11 +407,11 @@ class _MyPostsState extends State<MyPosts> {
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                top: 15.0),
+                                                left: 5.0, top: 15.0),
                                             child: Image.network(
                                               postList[index].imageURL,
                                               height: 140,
-                                              width: 120,
+                                              width: 100,
                                             ),
                                           ),
                                           Positioned(
@@ -510,7 +516,7 @@ class _MyPostsState extends State<MyPosts> {
                                                           .price
                                                           .length >
                                                       8) {
-                                                    return 1.0;
+                                                    return 0.95;
                                                   } else if (postList[index]
                                                           .price
                                                           .length >
@@ -528,7 +534,16 @@ class _MyPostsState extends State<MyPosts> {
                                               focusColor: const Color.fromARGB(
                                                   255, 83, 168, 238),
                                               textColor: Colors.black,
-                                              onTap: () {}, /////
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        PostView(
+                                                            postList[index]),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                           ),
                                         ],

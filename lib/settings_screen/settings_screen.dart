@@ -1,5 +1,7 @@
+import 'package:bindr_app/controllers/DatabaseInteractionSkeleton.dart';
 import 'package:bindr_app/items/bindr_drawer.dart';
 import 'package:bindr_app/items/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bindr_app/items/rounded_button.dart';
 
@@ -35,9 +37,81 @@ class SettingsScreen extends StatelessWidget {
                 },
               ),
               RoundButton(
-                backgroundcolor: Color.fromARGB(255, 215, 14, 0),
+                backgroundcolor: const Color.fromARGB(255, 215, 14, 0),
                 text: "DELETE ACCOUNT",
-                press: () {}, ///// delete account here
+                press: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (BuildContext innerContext) {
+                      return Scaffold(
+                        body: Center(
+                          child: Container(
+                            width: MediaQuery.of(innerContext).size.width * .9,
+                            height:
+                                MediaQuery.of(innerContext).size.height * .8,
+                            color: logobackground,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Are you sure you want to delete your account?",
+                                  style: TextStyle(
+                                      fontSize: 24, color: Colors.red),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(innerContext)
+                                              .size
+                                              .width /
+                                          3,
+                                      child: RoundButton(
+                                        text: "Yes",
+                                        press: () async {
+                                          //Delete post
+                                          await UserSerialize().deleteUser();
+                                          Navigator.of(context).popUntil(
+                                              (route) => !Navigator.of(context)
+                                                  .canPop());
+                                        },
+                                      ),
+                                    ),
+                                    Container(
+                                      color: const Color.fromARGB(0, 0, 0, 0),
+                                      width: MediaQuery.of(innerContext)
+                                              .size
+                                              .width /
+                                          6,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(innerContext)
+                                              .size
+                                              .width /
+                                          3,
+                                      child: RoundButton(
+                                        text: "No",
+                                        press: () {
+                                          Navigator.of(innerContext).pop();
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  );
+                },
+                // () async {
+                //   bool error = await UserSerialize().deleteUser();
+                //   if (!error) {
+                //     Navigator.of(context)
+                //         .popUntil((route) => !Navigator.of(context).canPop());
+                //   }
+                // },
               ),
             ],
           ),

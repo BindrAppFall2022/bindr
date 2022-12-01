@@ -5,7 +5,7 @@ import 'package:bindr_app/search_screen/search_results.dart';
 import 'package:flutter/material.dart';
 import '../services/auth.dart';
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
   //amount of the device screen height that the logo should be pushed down
   // default is .15
   final double logoYOffset;
@@ -13,12 +13,28 @@ class SearchScreen extends StatelessWidget {
 
   SearchScreen({super.key, this.logoYOffset = .15, this.logoWidth = .75});
 
-  String currentSearchString = "";
+  @override
+  State<SearchScreen> createState() => _SearchScreenState();
+}
 
-  final auth = AuthService(); //Temporary
+class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController _controllerSearchBar = TextEditingController();
+  String currentSearchString = "";
+  String? errorTextSearch;
 
   @override
+  void dispose() {
+    super.dispose();
+    _controllerSearchBar.dispose();
+  }
+
+  final auth = AuthService();
+  //Temporary
+  @override
   Widget build(BuildContext context) {
+    _controllerSearchBar.text = currentSearchString;
+    _controllerSearchBar.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controllerSearchBar.text.length));
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
@@ -33,26 +49,30 @@ class SearchScreen extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height * logoYOffset,
+              height: MediaQuery.of(context).size.height * widget.logoYOffset,
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width * logoWidth,
+              width: MediaQuery.of(context).size.width * widget.logoWidth,
               child: Image(
                   image:
                       Image.asset("assets/bindr_images/Bindr_logo_.png").image),
             ),
             Container(
-              width: MediaQuery.of(context).size.width * logoWidth,
+              width: MediaQuery.of(context).size.width * widget.logoWidth,
               decoration: const BoxDecoration(
                 color: gray,
                 // border: Border.all(),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: TextField(
+                controller: _controllerSearchBar,
                 enabled: true,
+                maxLength: 35,
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   border: InputBorder.none,
+                  counterText: '',
+                  errorText: errorTextSearch,
                   hintText: "Enter Book Title, Author, or ISBN",
                   floatingLabelAlignment: FloatingLabelAlignment.center,
                   suffixIconConstraints:
@@ -62,12 +82,6 @@ class SearchScreen extends StatelessWidget {
                     decoration: const BoxDecoration(
                       color: gray,
                       borderRadius: BorderRadius.all(Radius.circular(5)),
-                      /*boxShadow: const <BoxShadow>[
-                        BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 10,
-                            blurStyle: BlurStyle.solid),
-                      ], */
                     ),
                     child: IconButton(
                       onPressed: () async {
@@ -79,8 +93,11 @@ class SearchScreen extends StatelessWidget {
                                   )));
                           currentSearchString = currentSearchString;
                         } else {
-                          /////pop up
-                          debugPrint("ERROR: Search String is empty");
+                          setState(() {
+                            errorTextSearch =
+                                "  ERROR: Search text cannot be empty";
+                            currentSearchString = currentSearchString;
+                          });
                         }
                       },
                       icon: const Icon(
@@ -98,13 +115,18 @@ class SearchScreen extends StatelessWidget {
                               searchString: currentSearchString,
                             )));
                   } else {
-                    /////pop up
-                    debugPrint("ERROR: Search String is empty");
+                    setState(() {
+                      errorTextSearch = "  ERROR: Search text cannot be empty";
+                      currentSearchString = currentSearchString;
+                    });
                   }
                   currentSearchString = currentSearchString;
                 },
                 onChanged: (String text) {
-                  currentSearchString = text;
+                  setState(() {
+                    currentSearchString = text;
+                    errorTextSearch = null;
+                  });
                 },
               ),
             ),
@@ -113,18 +135,4 @@ class SearchScreen extends StatelessWidget {
       ),
     ));
   }
-
-  // static Future<MaterialPageRoute<dynamic>> search(
-  //     String searchText, BuildContext context, List<Object?> startAfter) async {
-  //   FocusScope.of(context).unfocus();
-  //   List<Post> postList = await PostSerialize().searchDB(
-  //       searchText.toLowerCase(), pageLimit,
-  //       orderBy: "last_modified", descending: true, startPoint: startAfter);
-  //   return MaterialPageRoute(
-  //       builder: (context) => SearchResults(
-  //             searchString: searchText,
-  //             lastPost: startAfter,
-  //             postList: postList,
-  //           ));
-  // }
 }

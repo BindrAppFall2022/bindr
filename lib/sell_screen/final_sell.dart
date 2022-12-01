@@ -16,6 +16,7 @@ class Confirm extends StatelessWidget {
   Object? isbn;
   Object? pic;
   String? description;
+  String? existingDocId;
   late ImageProvider backgroundImage;
 
   Condition con(cond) {
@@ -41,6 +42,7 @@ class Confirm extends StatelessWidget {
     required this.cond,
     required this.price,
     this.description,
+    this.existingDocId,
   });
 
   late String authorStr, isbnListStr, isbnStr;
@@ -157,11 +159,19 @@ class Confirm extends StatelessWidget {
                     qTitle: postTitle.toLowerCase(),
                     title: postTitle,
                     userID: FirebaseAuth.instance.currentUser!.uid,
+                    documentID: existingDocId,
                   );
-                  entry.createEntry().then((value) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const ConfirmScreen()));
-                  });
+                  if (existingDocId != null) {
+                    entry.updateEntry(existingDocId!).then((value) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ConfirmScreen(entry)));
+                    });
+                  } else {
+                    entry.createEntry().then((value) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ConfirmScreen(entry)));
+                    });
+                  }
 
                   //.then((value) {
                   //   Navigator.of(context)
